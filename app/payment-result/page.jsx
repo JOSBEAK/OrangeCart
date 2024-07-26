@@ -1,24 +1,10 @@
-"use client";
-
-import React, { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { CircularProgress, Box, Typography } from "@mui/material";
+import { redirect } from "next/navigation";
 
-// Dynamically import the success and failure pages
-const PaymentSuccessPage = dynamic(
-  () => import("@/components/PaymentSuccess"),
-  {
-    loading: () => <LoadingComponent message="Loading success page..." />,
-  }
-);
-
-const PaymentFailurePage = dynamic(
-  () => import("@/components/PaymentFailurePage"),
-  {
-    loading: () => <LoadingComponent message="Loading failure page..." />,
-  }
-);
+// Import the success and failure pages statically
+import PaymentSuccessPage from "@/components/PaymentSuccess";
+import PaymentFailurePage from "@/components/PaymentFailurePage";
 
 // Loading component
 function LoadingComponent({ message }) {
@@ -38,9 +24,13 @@ function LoadingComponent({ message }) {
   );
 }
 
-export default function PaymentResultPage() {
-  const searchParams = useSearchParams();
-  const status = searchParams.get("status");
+// This becomes a server component
+export default async function PaymentResultPage({ searchParams }) {
+  const status = searchParams.status;
+
+  if (!status) {
+    redirect("/checkout");
+  }
 
   return (
     <Suspense

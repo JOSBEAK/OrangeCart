@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
-export default function PaymentFailurePage() {
+const PaymentFailurePage = () => {
   const [countdown, setCountdown] = useState(10);
   const router = useRouter();
 
@@ -116,4 +116,5 @@ export default function PaymentFailurePage() {
       </Card>
     </Box>
   );
-}
+};
+export default PaymentFailurePage;

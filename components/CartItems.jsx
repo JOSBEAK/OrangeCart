@@ -11,11 +11,14 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
+  Button,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CartItemsSkeleton from "./CartItemsSkeleton";
+import Link from "next/link";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 const CartItems = ({ items, isLoading }) => {
   const theme = useTheme();
@@ -28,9 +31,30 @@ const CartItems = ({ items, isLoading }) => {
 
   if (!items || items.length === 0) {
     return (
-      <Typography variant="h6" align="center">
-        Your cart is empty.
-      </Typography>
+      <Box sx={{ textAlign: "center", py: 8 }}>
+        <ShoppingCartIcon sx={{ fontSize: 100, color: "#FF8C00", mb: 2 }} />
+        <Typography variant="h4" gutterBottom>
+          Your cart is empty
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Looks like you have not added any items to your cart yet.
+        </Typography>
+
+        <Button
+          variant="contained"
+          size="large"
+          component={Link}
+          href="/"
+          sx={{
+            backgroundColor: "#FF8C00",
+            "&:hover": {
+              backgroundColor: "#FFA500",
+            },
+          }}
+        >
+          Start Shopping
+        </Button>
+      </Box>
     );
   }
 

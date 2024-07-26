@@ -7,7 +7,7 @@ const OrangeIcon = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
       <path
         d="M480 256c0 123.4-100.5 223.9-223.9 223.9c-48.86 0-95.19-15.58-134.2-44.86c-14.14-10.59-17-30.66-6.391-44.81c10.61-14.09 30.69-16.97 44.8-6.375c27.84 20.91 61 31.94 95.89 31.94C344.3 415.8 416 344.1 416 256s-71.67-159.8-159.8-159.8C205.9 96.22 158.6 120.3 128.6 160H192c17.67 0 32 14.31 32 32s-14.33 32-32 32H48c-17.67 0-32-14.31-32-32V48c0-17.69 14.33-32 32-32s32 14.31 32 32v70.23C122.5 64.91 186.1 32.22 256.1 32.22C379.5 32.22 480 132.7 480 256z"
-        fill="#FFA500"
+        fill="#FF8C00"
       />
     </svg>
   </SvgIcon>
@@ -27,7 +27,7 @@ export default function NotFound() {
         backgroundColor: "#FFF3E0", // Light orange background
       }}
     >
-      <OrangeIcon sx={{ fontSize: 80, color: "#FFA500", marginBottom: 2 }} />
+      <OrangeIcon sx={{ fontSize: 80, color: "#FF8C00", marginBottom: 2 }} />
       <Typography variant="h4" gutterBottom sx={{ color: "#E65100" }}>
         404 - Page Not Found at Orange Mart
       </Typography>
@@ -46,9 +46,9 @@ export default function NotFound() {
         variant="contained"
         sx={{
           marginTop: 2,
-          backgroundColor: "#FFA500",
+          backgroundColor: "#FF8C00",
           "&:hover": {
-            backgroundColor: "#FF8C00",
+            backgroundColor: "#FFA500",
           },
         }}
       >

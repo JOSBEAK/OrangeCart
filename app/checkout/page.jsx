@@ -1,17 +1,49 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import CartPage from "@/components/CartPage";
-import Confirmation from "@/components/Confirmation";
-import AddressForm from "@/components/AddressForm";
-import PaymentForm from "@/components/PaymentForm";
-import ErrorFallback from "@/components/ErrorFallback";
+import dynamic from "next/dynamic";
+import { Box } from "@mui/material";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import LoadingSpinner from "@/components/LoadingSpinner";
+
+const CartPage = dynamic(() => import("@/components/CartPage"), {
+  loading: () => <LoadingFallback />,
+});
+
+const Confirmation = dynamic(() => import("@/components/Confirmation"), {
+  loading: () => <LoadingFallback />,
+});
+
+const AddressForm = dynamic(() => import("@/components/AddressForm"), {
+  loading: () => <LoadingFallback />,
+});
+
+const PaymentForm = dynamic(() => import("@/components/PaymentForm"), {
+  loading: () => <LoadingFallback />,
+});
+
+const ErrorFallback = dynamic(() => import("@/components/ErrorFallback"), {
+  loading: () => <LoadingFallback />,
+});
+
+function LoadingFallback() {
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="50vh"
+    >
+      <LoadingSpinner />
+    </Box>
+  );
+}
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const currentStep = searchParams.get("current") || "bag";
 
-  try {
+  const renderStep = () => {
     switch (currentStep) {
       case "bag":
         return <CartPage />;
@@ -22,10 +54,11 @@ export default function CheckoutPage() {
       case "payment":
         return <PaymentForm />;
       default:
-        return <ErrorFallback />; // Default to bag/cart page
+        return <CartPage />;
     }
-  } catch (error) {
-    console.error("Error in CheckoutPage:", error);
-    return <ErrorFallback error={error} />;
-  }
+  };
+
+  return (
+    <ErrorBoundary fallback={<ErrorFallback />}>{renderStep()}</ErrorBoundary>
+  );
 }

@@ -7,19 +7,60 @@ import {
   TextField,
   Button,
   Box,
+  Alert,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { setPaymentMethod } from "@/lib/slices/cartSlice";
+import { useDispatch } from "react-redux";
 
 const UPIForm = () => {
   const [upiOption, setUpiOption] = useState("vpa");
   const [vpa, setVpa] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const upiHandles = [
+    "okhdfc",
+    "okhdfcbank",
+    "oksbi",
+    "okicici",
+    "okaxis",
+    "okbob",
+    "okciti",
+    "gpay",
+    "paytm",
+    "upi",
+    "ybl",
+  ];
+
+  const validateUPI = (input) => {
+    return upiHandles.some((handle) => input.toLowerCase().includes(handle));
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Handle UPI payment logic here
-    console.log("UPI payment initiated");
-    router.push("/payment-result?status=failure");
+    setError("");
+
+    if (upiOption === "vpa") {
+      if (!vpa.trim()) {
+        setError("Please enter a UPI ID.");
+        return;
+      }
+
+      if (!validateUPI(vpa)) {
+        setError("Invalid UPI ID. Please check and try again.");
+        return;
+      }
+    }
+
+    // Randomly decide success or failure
+    const isSuccess = Math.random() < 0.5;
+    const status = isSuccess ? "success" : "failure";
+    if (status === "success") {
+      dispatch(setPaymentMethod("UPI"));
+    }
+    router.push(`/payment-result?status=${status}`);
   };
 
   return (
@@ -44,10 +85,17 @@ const UPIForm = () => {
           value={vpa}
           onChange={(e) => setVpa(e.target.value)}
           sx={{ mb: 2 }}
+          error={!!error}
+          helperText={error}
         />
       )}
       {upiOption === "qr" && (
         <Box sx={{ mt: 2, mb: 2 }}>QR Code placeholder</Box>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
       )}
       <Button
         type="submit"
@@ -57,6 +105,7 @@ const UPIForm = () => {
         sx={{
           mt: 2,
           backgroundColor: "black",
+          color: "white",
           "&:hover": { backgroundColor: "grey.800" },
         }}
       >

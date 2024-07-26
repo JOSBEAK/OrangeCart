@@ -14,6 +14,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockIcon from "@mui/icons-material/Lock";
 import dynamic from "next/dynamic";
+import LoadingSpinner from "./LoadingSpinner";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -21,13 +22,16 @@ const stripePromise = loadStripe(
 
 // Lazy load payment components
 const UPIForm = dynamic(() => import("./UPIForm"), {
-  loading: () => <CircularProgress />,
+  loading: () => <LoadingSpinner />,
+  ssr: false,
 });
 const CardPaymentForm = dynamic(() => import("./CardPaymentForm"), {
-  loading: () => <CircularProgress />,
+  loading: () => <LoadingSpinner />,
+  ssr: false,
 });
 const CashOnDeliveryForm = dynamic(() => import("./CashOnDeliveryForm"), {
-  loading: () => <CircularProgress />,
+  loading: () => <LoadingSpinner />,
+  ssr: false,
 });
 
 const PaymentForm = () => {
@@ -78,7 +82,7 @@ const PaymentForm = () => {
         </AccordionSummary>
         <AccordionDetails>
           {loadUPI && (
-            <Suspense fallback={<CircularProgress />}>
+            <Suspense fallback={<LoadingSpinner />}>
               <UPIForm />
             </Suspense>
           )}
@@ -91,7 +95,7 @@ const PaymentForm = () => {
         </AccordionSummary>
         <AccordionDetails>
           {loadCard && clientSecret && (
-            <Suspense fallback={<CircularProgress />}>
+            <Suspense fallback={<LoadingSpinner />}>
               <CardPaymentForm
                 clientSecret={clientSecret}
                 stripePromise={stripePromise}
@@ -107,7 +111,7 @@ const PaymentForm = () => {
         </AccordionSummary>
         <AccordionDetails>
           {loadCOD && (
-            <Suspense fallback={<CircularProgress />}>
+            <Suspense fallback={<LoadingSpinner />}>
               <CashOnDeliveryForm />
             </Suspense>
           )}

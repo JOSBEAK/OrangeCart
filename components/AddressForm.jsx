@@ -15,44 +15,10 @@ import {
   Typography,
   ThemeProvider,
   createTheme,
+  useTheme,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#1a237e",
-    },
-    secondary: {
-      main: "#ff6f00",
-    },
-    error: {
-      main: "#d32f2f",
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h4: {
-      fontWeight: 700,
-    },
-  },
-  components: {
-    MuiTextField: {
-      defaultProps: {
-        variant: "outlined",
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: "none",
-          fontWeight: 600,
-        },
-      },
-    },
-  },
-});
+// import { useRouteProtection } from "@/hooks/useRouteProtection";
 
 const initialAddress = {
   firstName: "",
@@ -78,13 +44,15 @@ const fieldValidators = {
   default: (value) => (value.trim() ? "" : "This field is required"),
 };
 
-export default function AddressForm() {
+const AddressFormContent = () => {
   const [address, setAddressState] = useState(initialAddress);
   const [errors, setErrors] = useState({});
   const [feedback, setFeedback] = useState({});
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  // const { completeStep } = useRouteProtection();
+  const theme = useTheme();
 
   const validateField = useCallback((name, value) => {
     const validator = fieldValidators[name] || fieldValidators.default;
@@ -129,7 +97,6 @@ export default function AddressForm() {
 
       Object.entries(address).forEach(([key, value]) => {
         if (key !== "landmark") {
-          // Skip validation for landmark
           const error = validateField(key, value);
           if (error) newErrors[key] = error;
         }
@@ -139,6 +106,7 @@ export default function AddressForm() {
         setLoading(true);
         try {
           dispatch(setAddress(address));
+          // completeStep("delivery");
           router.push("checkout?current=payment");
         } catch (error) {
           console.error("Error saving address:", error);
@@ -162,74 +130,137 @@ export default function AddressForm() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <ThemeProvider theme={theme}>
-      <Box maxWidth="md" sx={{ margin: "auto", py: 4 }}>
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-          <Box display="flex" alignItems="center" mb={3}>
-            <LocationOnIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
-            <Typography variant="h4" component="h1">
-              Shipping Address
-            </Typography>
-          </Box>
+    <Box maxWidth="md" sx={{ margin: "auto", py: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        <Box display="flex" alignItems="center" mb={3}>
+          <LocationOnIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
+          <Typography variant="h4" component="h1">
+            Shipping Address
+          </Typography>
+        </Box>
 
-          <Box component="form" onSubmit={handleSubmit} noValidate>
-            {errors.form && <ErrorMessage message={errors.form} />}
-            <Grid container spacing={3}>
-              {Object.entries(address).map(([field, value]) => (
-                <Grid
-                  item
-                  xs={12}
-                  sm={
-                    field === "streetAddress" || field === "landmark" ? 12 : 6
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          {errors.form && <ErrorMessage message={errors.form} />}
+          <Grid container spacing={3}>
+            {Object.entries(address).map(([field, value]) => (
+              <Grid
+                item
+                xs={12}
+                sm={field === "streetAddress" || field === "landmark" ? 12 : 6}
+                key={field}
+              >
+                <TextField
+                  fullWidth
+                  label={
+                    field.charAt(0).toUpperCase() +
+                    field.slice(1).replace(/([A-Z])/g, " $1")
                   }
-                  key={field}
-                >
-                  <TextField
-                    fullWidth
-                    label={
-                      field.charAt(0).toUpperCase() +
-                      field.slice(1).replace(/([A-Z])/g, " $1")
-                    }
-                    name={field}
-                    value={value}
-                    onChange={handleChange}
-                    error={!!errors[field] || !!feedback[field]}
-                    helperText={errors[field] || feedback[field]}
-                    InputProps={{
-                      sx: { borderRadius: 2 },
-                    }}
-                    required={field !== "landmark"}
-                  />
-                </Grid>
-              ))}
-            </Grid>
+                  name={field}
+                  value={value}
+                  onChange={handleChange}
+                  error={!!errors[field] || !!feedback[field]}
+                  helperText={errors[field] || feedback[field]}
+                  InputProps={{
+                    sx: { borderRadius: 2 },
+                  }}
+                  required={field !== "landmark"}
+                />
+              </Grid>
+            ))}
+          </Grid>
 
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              We will only contact you if there are questions about your order.
-            </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            We will only contact you if there are questions about your order.
+          </Typography>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              disabled={!isFormValid}
-              sx={{
-                mt: 2,
-                py: 1.5,
-                bgcolor: "secondary.main",
-                "&:hover": { bgcolor: "secondary.dark" },
-              }}
-            >
-              Proceed to Payment
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={!isFormValid}
+            sx={{
+              mt: 2,
+              py: 1.5,
+              backgroundColor: "#FF8C00",
+              color: theme.palette.mode === "dark" ? "grey.100" : "white",
+              "&:hover": {
+                backgroundColor: "#FFA500",
+              },
+            }}
+          >
+            Proceed to Payment
+          </Button>
+        </Box>
+      </Paper>
+    </Box>
+  );
+};
+
+// Wrapper component to provide theme
+const DarkModeAddressForm = () => {
+  const theme = useTheme();
+
+  const darkModeTheme = useMemo(
+    () =>
+      createTheme({
+        ...theme,
+        palette: {
+          ...theme.palette,
+          mode: theme.palette.mode,
+          primary: {
+            main: theme.palette.mode === "dark" ? "#5c6bc0" : "#1a237e",
+          },
+          secondary: {
+            main: theme.palette.mode === "dark" ? "#ffa726" : "#ff6f00",
+          },
+          error: {
+            main: theme.palette.mode === "dark" ? "#f44336" : "#d32f2f",
+          },
+          background: {
+            default: theme.palette.mode === "dark" ? "#121212" : "#f5f5f5",
+            paper: theme.palette.mode === "dark" ? "#1e1e1e" : "#ffffff",
+          },
+          text: {
+            primary: theme.palette.mode === "dark" ? "#ffffff" : "#000000",
+            secondary: theme.palette.mode === "dark" ? "#b0bec5" : "#757575",
+          },
+        },
+        components: {
+          MuiTextField: {
+            styleOverrides: {
+              root: {
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(255, 255, 255, 0.23)"
+                        : "rgba(0, 0, 0, 0.23)",
+                  },
+                  "&:hover fieldset": {
+                    borderColor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(255, 255, 255, 0.87)"
+                        : "rgba(0, 0, 0, 0.87)",
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    [theme]
+  );
+
+  return (
+    <ThemeProvider theme={darkModeTheme}>
+      <AddressFormContent />
     </ThemeProvider>
   );
-}
+};
+
+export default DarkModeAddressForm;

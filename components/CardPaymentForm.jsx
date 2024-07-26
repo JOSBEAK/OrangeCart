@@ -1,27 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Elements,
   PaymentElement,
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Typography,
+  useTheme,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { setPaymentMethod } from "@/lib/slices/cartSlice";
 
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
-
+  const theme = useTheme();
+  const dispatch = useDispatch();
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    dispatch(setPaymentMethod("Card"));
 
     if (!stripe || !elements) {
       return;
     }
 
+    if (status === "success") {
+      dispatch(setPaymentMethod("UPI"));
+    }
     setProcessing(true);
-
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -39,7 +52,18 @@ const CheckoutForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentElement />
+      <PaymentElement
+        options={{
+          style: {
+            base: {
+              color: theme.palette.text.primary,
+              "::placeholder": {
+                color: theme.palette.text.secondary,
+              },
+            },
+          },
+        }}
+      />
       <Button
         type="submit"
         variant="contained"
@@ -48,7 +72,12 @@ const CheckoutForm = () => {
         sx={{
           mt: 2,
           backgroundColor: "black",
-          "&:hover": { backgroundColor: "grey.800" },
+          color: theme.palette.mode === "dark" ? "grey.100" : "white",
+          "&:hover": {
+            backgroundColor:
+              theme.palette.mode === "dark" ? "grey.700" : "grey.800",
+          },
+          width: "100%",
         }}
       >
         Pay Now
@@ -63,9 +92,18 @@ const CheckoutForm = () => {
 };
 
 const CardPaymentForm = ({ clientSecret, stripePromise }) => {
+  const theme = useTheme();
+
+  const stripeTheme = useMemo(
+    () => ({
+      theme: theme.palette.mode === "dark" ? "night" : "stripe",
+    }),
+    [theme.palette.mode]
+  );
+
   const options = {
     clientSecret,
-    appearance: { theme: "stripe" },
+    appearance: stripeTheme,
   };
 
   return (
@@ -75,4 +113,30 @@ const CardPaymentForm = ({ clientSecret, stripePromise }) => {
   );
 };
 
-export default CardPaymentForm;
+// Wrapper component to provide theme
+const DarkModeCardPaymentForm = ({ clientSecret, stripePromise }) => {
+  const theme = useTheme();
+
+  const darkModeTheme = useMemo(
+    () =>
+      createTheme({
+        ...theme,
+        palette: {
+          ...theme.palette,
+          mode: theme.palette.mode,
+        },
+      }),
+    [theme]
+  );
+
+  return (
+    <ThemeProvider theme={darkModeTheme}>
+      <CardPaymentForm
+        clientSecret={clientSecret}
+        stripePromise={stripePromise}
+      />
+    </ThemeProvider>
+  );
+};
+
+export default DarkModeCardPaymentForm;

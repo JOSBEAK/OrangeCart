@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Stack from "@mui/material/Stack";
@@ -88,7 +89,7 @@ const steps = [
   { label: "Confirmation", value: "confirmation" },
 ];
 
-export default function OrangeBagDeliveryStepper() {
+const OrangeBagDeliveryStepper = () => {
   const searchParams = useSearchParams();
   const [activeStep, setActiveStep] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -125,4 +126,5 @@ export default function OrangeBagDeliveryStepper() {
       </Stack>
     </TransitionWrapper>
   );
-}
+};
+export default OrangeBagDeliveryStepper;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-export default function ThemeToggle() {
+const ThemeToggle = () => {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -18,4 +18,5 @@ export default function ThemeToggle() {
       Toggle {darkMode ? "Light" : "Dark"} Mode
     </button>
   );
-}
+};
+export default ThemeToggle;

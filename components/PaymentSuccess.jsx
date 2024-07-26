@@ -11,8 +11,10 @@ import {
   Button,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+// import { useRouteProtection } from "@/hooks/useRouteProtection";
 
-export default function PaymentSuccessPage() {
+const PaymentSuccessPage = () => {
+  // const { completeStep } = useRouteProtection();
   const [countdown, setCountdown] = useState(5);
   const router = useRouter();
 
@@ -32,6 +34,7 @@ export default function PaymentSuccessPage() {
   }, [router]);
 
   const handleContinue = () => {
+    // completeStep("payment");
     router.push("checkout?current=confirmation");
   };
 
@@ -117,4 +120,5 @@ export default function PaymentSuccessPage() {
       </Card>
     </Box>
   );
-}
+};
+export default PaymentSuccessPage;
