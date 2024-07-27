@@ -51,6 +51,8 @@ export default function Home() {
             sx={{
               py: 2,
               px: 4,
+              fontWeight: "bold",
+
               fontSize: "1.2rem",
               bgcolor: theme.palette.mode === "dark" ? "#FFA500" : "#FF8C00",
               "&:hover": {

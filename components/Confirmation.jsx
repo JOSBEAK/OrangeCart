@@ -20,6 +20,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { resetCart } from "@/lib/slices/cartSlice";
 import { useRouter } from "next/navigation";
+import buttonStyle from "@/styles/buttonStyle";
 
 const ConfirmationComponent = () => {
   const { discountedTotal, address, paymentMethod } = useSelector(
@@ -210,20 +211,7 @@ const ConfirmationComponent = () => {
                   variant="contained"
                   color="primary"
                   size="large"
-                  sx={{
-                    px: 4,
-                    py: 1.5,
-                    borderRadius: 1,
-                    boxShadow: 3,
-                    backgroundColor: "#FF8C00",
-                    color: "#fff",
-                    "&:hover": {
-                      transform: "translateY(-2px)",
-                      backgroundColor: "#FFA500",
-                      boxShadow: 5,
-                    },
-                    transition: "all 0.3s",
-                  }}
+                  sx={buttonStyle()}
                   onClick={handleContinueShopping}
                 >
                   Continue Shopping
