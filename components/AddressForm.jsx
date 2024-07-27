@@ -44,7 +44,7 @@ const fieldValidators = {
   default: (value) => (value.trim() ? "" : "This field is required"),
 };
 
-const AddressFormContent = () => {
+const AddressFormContent = ({ setDisableButtonOnEachPage }) => {
   const [address, setAddressState] = useState(initialAddress);
   const [errors, setErrors] = useState({});
   const [feedback, setFeedback] = useState({});
@@ -106,8 +106,6 @@ const AddressFormContent = () => {
         setLoading(true);
         try {
           dispatch(setAddress(address));
-          // completeStep("delivery");
-          router.push("checkout?current=payment");
         } catch (error) {
           console.error("Error saving address:", error);
           setErrors({ form: "Failed to save address. Please try again." });
@@ -122,9 +120,11 @@ const AddressFormContent = () => {
   );
 
   const isFormValid = useMemo(() => {
-    return Object.entries(address).every(
+    let isValid = Object.entries(address).every(
       ([key, value]) => key === "landmark" || (value.trim() && !errors[key])
     );
+    setDisableButtonOnEachPage(isValid);
+    return isValid;
   }, [address, errors]);
 
   if (loading) return <LoadingSpinner />;
@@ -202,7 +202,7 @@ const AddressFormContent = () => {
 };
 
 // Wrapper component to provide theme
-const DarkModeAddressForm = () => {
+const DarkModeAddressForm = ({ setDisableButtonOnEachPage }) => {
   const theme = useTheme();
 
   const darkModeTheme = useMemo(
@@ -258,7 +258,9 @@ const DarkModeAddressForm = () => {
 
   return (
     <ThemeProvider theme={darkModeTheme}>
-      <AddressFormContent />
+      <AddressFormContent
+        setDisableButtonOnEachPage={setDisableButtonOnEachPage}
+      />
     </ThemeProvider>
   );
 };

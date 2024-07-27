@@ -1,7 +1,10 @@
+"use client";
 import Link from "next/link";
-import { Box, Typography, Button, Container } from "@mui/material";
+import { Box, Typography, Button, Container, useTheme } from "@mui/material";
 
 export default function Home() {
+  const theme = useTheme();
+
   return (
     <Box
       component="main"
@@ -11,7 +14,10 @@ export default function Home() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(to bottom, #fff3e0, #ffe0b2)",
+        background:
+          theme.palette.mode === "dark"
+            ? "linear-gradient(to bottom, #263238, #212121)"
+            : "linear-gradient(to bottom, #fff3e0, #ffe0b2)",
       }}
     >
       <Container maxWidth="sm">
@@ -20,32 +26,40 @@ export default function Home() {
             variant="h2"
             component="h1"
             gutterBottom
-            sx={{ color: "#e65100", fontWeight: "bold" }}
+            sx={{
+              color: theme.palette.mode === "dark" ? "#ffb74d" : "#e65100",
+              fontWeight: "bold",
+            }}
           >
             Welcome to Orange Cart
           </Typography>
-          <Typography variant="h5" sx={{ mb: 4, color: "#ef6c00" }}>
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 4,
+              color: theme.palette.mode === "dark" ? "#ffa726" : "#ef6c00",
+            }}
+          >
             Your one-stop shop for all Your stuff!
           </Typography>
-          {/* <Link href="/checkout?current=bag" passHref> */}
+
           <Button
             variant="contained"
             size="large"
             component={Link}
-            href="/checkout?current=bag"
+            href="/checkout"
             sx={{
               py: 2,
               px: 4,
               fontSize: "1.2rem",
-              bgcolor: "#FF8C00",
+              bgcolor: theme.palette.mode === "dark" ? "#FFA500" : "#FF8C00",
               "&:hover": {
-                bgcolor: "#FFA500",
+                bgcolor: theme.palette.mode === "dark" ? "#FFB74D" : "#FFA500",
               },
             }}
           >
             Start Shopping
           </Button>
-          {/* </Link> */}
         </Box>
       </Container>
     </Box>

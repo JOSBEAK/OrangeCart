@@ -18,7 +18,6 @@ export default function CheckoutLayout({ children }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const current = searchParams.get("current") || "bag";
-  const { items } = useSelector((state) => state.cart);
 
   const handleBack = () => {
     const currentIndex = steps.findIndex((step) => step.value === current);
@@ -40,7 +39,7 @@ export default function CheckoutLayout({ children }) {
           position: "relative",
         }}
       >
-        {showBackButton && (
+        {/* {showBackButton && (
           <Box sx={{ alignSelf: "flex-start", marginBottom: 2 }}>
             <Button
               startIcon={<ArrowBackIcon />}
@@ -55,10 +54,7 @@ export default function CheckoutLayout({ children }) {
               Back
             </Button>
           </Box>
-        )}
-        <Box sx={{ width: "100%", maxWidth: 600, alignSelf: "center" }}>
-          <CheckoutStepper />
-        </Box>
+        )} */}
       </Box>
       <Container
         sx={{
@@ -68,11 +64,6 @@ export default function CheckoutLayout({ children }) {
         }}
       >
         <Box sx={{ flex: 1, marginRight: { md: 2 } }}>{children}</Box>
-        {items.length !== 0 && (
-          <Box sx={{ flex: 1 }}>
-            <OrderSummary />
-          </Box>
-        )}
       </Container>
     </Box>
   );
