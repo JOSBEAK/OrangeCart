@@ -1,5 +1,4 @@
-"use client";
-
+import React from "react";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,8 +11,40 @@ import {
   ListItemAvatar,
   Divider,
   Button,
+  IconButton,
+  Badge,
+  styled,
 } from "@mui/material";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import CloseIcon from "@mui/icons-material/Close";
 import EmptyCart from "./EmptyCart";
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  maxWidth: 350,
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[10],
+}));
+
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+  transition: "background-color 0.3s",
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const StyledImage = styled(Image)({
+  borderRadius: "50%",
+  objectFit: "cover",
+});
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.secondary.dark,
+  },
+}));
 
 const CartModalContent = ({ open, handleClose }) => {
   const { items, status } = useSelector((state) => state.cart);
@@ -23,55 +54,71 @@ const CartModalContent = ({ open, handleClose }) => {
   }
 
   return (
-    <Box sx={{ p: 2, maxWidth: 300 }}>
-      <Typography variant="h6" gutterBottom>
-        Cart Items
-      </Typography>
-      <List>
+    <Box>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        p={2}
+      >
+        <Typography variant="h6" fontWeight="bold">
+          Your Cart
+        </Typography>
+        <IconButton onClick={handleClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      <Divider />
+      <List sx={{ maxHeight: 300, overflowY: "auto", scrollbarWidth: "none" }}>
         {items.map((item, index) => (
-          <div key={item.id}>
-            <ListItem alignItems="flex-start">
+          <React.Fragment key={item.id}>
+            <StyledListItem alignItems="flex-start">
               <ListItemAvatar>
                 {open && (
-                  <Image
+                  <StyledImage
                     src={item.thumbnail}
                     alt={item.title}
-                    width={40}
-                    height={40}
+                    width={50}
+                    height={50}
                     loading="lazy"
                   />
                 )}
               </ListItemAvatar>
               <ListItemText
                 primary={item.name}
-                secondary={`Quantity: ${item.quantity} - ₹${item.price.toFixed(
-                  2
-                )}`}
+                secondary={
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                  >{`Quantity: ${item.quantity} • ₹${item.price.toFixed(
+                    2
+                  )}`}</Typography>
+                }
               />
-            </ListItem>
+              <Badge badgeContent={item.quantity} color="secondary">
+                <ShoppingCartIcon />
+              </Badge>
+            </StyledListItem>
             {index < items.length - 1 && (
               <Divider variant="inset" component="li" />
             )}
-          </div>
+          </React.Fragment>
         ))}
       </List>
-      <Box sx={{ mt: 2, textAlign: "center" }}>
-        <Button
+      <Box p={2} textAlign="center">
+        <StyledButton
           variant="contained"
           component={Link}
           href="/checkout?current=bag"
-          sx={{
-            backgroundColor: "#FF8C00",
-            "&:hover": {
-              backgroundColor: "#FFA500",
-            },
-          }}
           onClick={handleClose}
+          fullWidth
+          startIcon={<ShoppingCartIcon />}
         >
-          Go to Cart
-        </Button>
+          Proceed to Checkout
+        </StyledButton>
       </Box>
     </Box>
   );
 };
+
 export default CartModalContent;

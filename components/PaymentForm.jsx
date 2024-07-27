@@ -15,6 +15,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockIcon from "@mui/icons-material/Lock";
 import dynamic from "next/dynamic";
 import LoadingSpinner from "./LoadingSpinner";
+import headingStyle from "@/styles/headingStyle";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -60,7 +61,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
 
   return (
     <Box sx={{ maxWidth: 600, margin: "auto", padding: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+      <Typography variant="h4" gutterBottom sx={headingStyle}>
         Payment Options
       </Typography>
       <Alert

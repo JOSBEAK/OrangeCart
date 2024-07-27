@@ -26,6 +26,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import OrderSummary from "@/components/OrderSummary";
 import PaymentSuccessModal from "@/components/PaymentSuccess";
 import { setActiveStep } from "@/lib/slices/cartSlice";
+import buttonStyle from "@/styles/buttonStyle";
 
 const OrangeConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -147,7 +148,12 @@ export default function CheckoutPage() {
   const renderStep = () => {
     switch (activeStep) {
       case 0:
-        return <CartPage />;
+        return (
+          <CartPage
+            handleNext={handleNext}
+            isButtonDisabled={isButtonDisabled}
+          />
+        );
       case 1:
         return (
           <AddressForm setIsFormValid={setIsFormValid} formRef={formRef} />
@@ -198,16 +204,20 @@ export default function CheckoutPage() {
         >
           <Box sx={{ flex: 1, marginRight: { md: 2 } }}>
             <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+              sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
             >
               {activeStep > 0 && activeStep < steps.length - 1 && (
-                <Button color="inherit" onClick={handleBack}>
+                <Button variant="contained" onClick={handleBack}>
                   Back
                 </Button>
               )}
-              {activeStep < steps.length - 1 && (
-                <Button onClick={handleNext} disabled={isButtonDisabled()}>
-                  {`Proceed to ${steps[activeStep + 1].label}`}
+              {activeStep == 1 && (
+                <Button
+                  sx={buttonStyle(isButtonDisabled())}
+                  onClick={handleNext}
+                  disabled={isButtonDisabled()}
+                >
+                  {`Proceed to ${steps[activeStep + 1]?.label}`}
                 </Button>
               )}
             </Box>

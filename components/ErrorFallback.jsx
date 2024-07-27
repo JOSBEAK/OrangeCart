@@ -23,7 +23,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
       <Button
         variant="contained"
         color="primary"
-        onClick={resetErrorBoundary}
+        onClick={() => window.location.reload()}
         sx={{ marginTop: 2 }}
       >
         Try Again

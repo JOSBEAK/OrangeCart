@@ -201,7 +201,7 @@ const ConfirmationContent = () => {
                   sx={{
                     px: 4,
                     py: 1.5,
-                    borderRadius: 50,
+                    borderRadius: 1,
                     boxShadow: 3,
                     backgroundColor: "#FF8C00", // darker orange color on hover
                     color: "#fff", // white text color

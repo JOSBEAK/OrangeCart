@@ -108,7 +108,11 @@ const OrderSummary = () => {
           <Divider sx={{ my: 2 }} />
           <ListItem disableGutters>
             <ListItemText
-              primary={<Typography variant="h6">Total</Typography>}
+              primary={
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Grand total
+                </Typography>
+              }
               secondary="(Inclusive of all taxes)"
             />
             <Typography variant="h6" color="primary.main">

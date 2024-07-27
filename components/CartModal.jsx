@@ -34,7 +34,7 @@ const CartModal = ({ open, anchorEl, handleClose }) => {
     >
       <Box
         sx={{
-          p: 2,
+          p: 1,
           minWidth: 300,
           minHeight: 200,
           display: "flex",
