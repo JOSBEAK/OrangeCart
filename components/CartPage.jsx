@@ -16,32 +16,30 @@ const CartPage = ({ handleNext, isButtonDisabled }) => {
     }
   });
   return (
-    <Container maxWidth="md">
-      <Box my={1}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 5,
-          }}
+    <Box maxWidth="lg">
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 5,
+        }}
+      >
+        <Typography sx={headingStyle} variant="h6" gutterBottom>
+          Your Cart
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleNext}
+          disabled={isButtonDisabled()}
+          sx={buttonStyle(items.length > 0 ? false : true)}
         >
-          <Typography sx={headingStyle} variant="h4" gutterBottom>
-            Your Cart
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNext}
-            disabled={isButtonDisabled()}
-            sx={buttonStyle(items.length > 0 ? false : true)}
-          >
-            Delivery Address
-          </Button>
-        </Box>
-        <CartItems items={items} isLoading={status === "loading"} />
+          Delivery Address
+        </Button>
       </Box>
-    </Container>
+      <CartItems items={items} isLoading={status === "loading"} />
+    </Box>
   );
 };
 export default CartPage;

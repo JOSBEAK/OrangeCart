@@ -29,21 +29,20 @@ const ItemCard = dynamic(() => import("./ItemCard"), {
 });
 
 const OrderSummary = () => {
-  const { items, total, discountedTotal, status, error } = useSelector(
-    (state) => state.cart
-  );
+  const { items, total, discountedTotal, status, error, activeStep } =
+    useSelector((state) => state.cart);
   const searchParams = useSearchParams();
   const currentPage = searchParams.get("current");
   const [showItems, setShowItems] = useState(false);
   const [loadItems, setLoadItems] = useState(false);
 
   useEffect(() => {
-    if (currentPage !== "bag" && items.length > 0) {
+    if (items.length > 0) {
       console.log("Setting showItems and loadItems to true");
       setShowItems(true);
       setLoadItems(true);
     }
-    if (currentPage === "bag") {
+    if (activeStep === 0 || items.length === 0) {
       setShowItems(false);
     }
   }, [currentPage, items]);

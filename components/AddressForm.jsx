@@ -24,7 +24,7 @@ const AddressForm = ({ formRef }) => {
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Box display="flex" alignItems="center" mb={3}>
           <LocationOnIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
-          <Typography sx={headingStyle} variant="h4" component="h1">
+          <Typography sx={headingStyle} variant="h6" component="h1">
             Shipping Address
           </Typography>
         </Box>

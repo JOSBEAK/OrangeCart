@@ -92,11 +92,10 @@ const CartItems = ({ items, isLoading }) => {
             </Box>
             <CardContent
               sx={{
-                flex: "1 0 auto",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                width: `calc(100% - ${isMobile ? 100 : 150}px)`,
+                flexGrow: 1,
                 padding: isMobile ? "8px !important" : "16px !important",
               }}
             >
@@ -104,13 +103,17 @@ const CartItems = ({ items, isLoading }) => {
                 <Typography
                   variant={isMobile ? "subtitle1" : "h6"}
                   component="div"
-                  noWrap
                   sx={{
                     fontSize: isMobile
                       ? "0.9rem"
                       : isTablet
                       ? "1.1rem"
                       : "1.25rem",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
                   }}
                 >
                   {item.title}
@@ -118,7 +121,7 @@ const CartItems = ({ items, isLoading }) => {
               </Box>
               <Box
                 display="flex"
-                justifyContent="space-around"
+                justifyContent="space-between"
                 alignItems="center"
                 mt={isMobile ? 1 : 2}
               >
@@ -131,35 +134,13 @@ const CartItems = ({ items, isLoading }) => {
                       : isTablet
                       ? "1.1rem"
                       : "1.25rem",
-                    flexGrow: 0.5,
                   }}
                 >
                   ₹{item.price.toFixed(2)}
                 </Typography>
-                <Box display="flex" alignItems="center">
-                  <IconButton size={isMobile ? "small" : "medium"}>
-                    <RemoveIcon fontSize={isMobile ? "small" : "medium"} />
-                  </IconButton>
-                  <Chip
-                    label={item.quantity}
-                    size={isMobile ? "small" : "medium"}
-                    color="primary"
-                    sx={{
-                      mx: 0.5,
-                      fontSize: isMobile ? "0.75rem" : "0.875rem",
-                    }}
-                  />
-                  <IconButton size={isMobile ? "small" : "medium"}>
-                    <AddIcon fontSize={isMobile ? "small" : "medium"} />
-                  </IconButton>
-                </Box>
-                <IconButton color="error" size={isMobile ? "small" : "medium"}>
-                  <DeleteOutlineIcon fontSize={isMobile ? "small" : "medium"} />
-                </IconButton>
               </Box>
             </CardContent>
           </Card>
-          <Divider sx={{ my: isMobile ? 1 : 2 }} />
         </Grid>
       ))}
     </Grid>

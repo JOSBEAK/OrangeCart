@@ -60,7 +60,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
 
   return (
     <Box sx={{ maxWidth: 600, margin: "auto", padding: 3 }}>
-      <Typography variant="h4" gutterBottom sx={headingStyle}>
+      <Typography variant="h6" gutterBottom sx={headingStyle}>
         Payment Options
       </Typography>
       <Alert

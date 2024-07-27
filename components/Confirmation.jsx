@@ -12,6 +12,7 @@ import {
   Fade,
   Divider,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -27,6 +28,8 @@ const ConfirmationComponent = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   useEffect(() => {
     history.pushState(null, null, location.href);
     window.onpopstate = function () {
@@ -43,6 +46,7 @@ const ConfirmationComponent = () => {
       dispatch(resetCart());
     }, 100);
   };
+
   return (
     <Box
       sx={{
@@ -56,11 +60,18 @@ const ConfirmationComponent = () => {
         paddingTop: 4,
       }}
     >
-      <Container maxWidth="md">
+      <Container
+        maxWidth={isSmallScreen ? "sm" : "md"}
+        sx={{ px: { xs: 0, sm: 1, md: 3 } }}
+      >
         <Fade in={true} timeout={1000}>
           <Paper
             elevation={3}
-            sx={{ p: 4, borderRadius: 4, overflow: "hidden" }}
+            sx={{
+              p: { xs: 2, sm: 3, md: 4 },
+              borderRadius: 4,
+              overflow: "hidden",
+            }}
           >
             <Grid container spacing={4} direction="column" alignItems="center">
               <Grid item>
