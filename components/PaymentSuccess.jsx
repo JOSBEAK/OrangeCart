@@ -7,13 +7,14 @@ import {
   Card,
   CardContent,
   Typography,
-  CircularProgress,
   Button,
+  useTheme,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const PaymentSuccessModal = ({ open, onClose }) => {
   const [countdown, setCountdown] = useState(5);
+  const theme = useTheme();
 
   useEffect(() => {
     let timer;
@@ -59,9 +60,15 @@ const PaymentSuccessModal = ({ open, onClose }) => {
             maxWidth: 400,
             textAlign: "center",
             padding: 4,
-            backgroundColor: "rgba(255, 255, 255, 0.95)",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? "grey.800"
+                : "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(10px)",
-            boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)",
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 8px 32px rgba(255, 255, 255, 0.1)"
+                : "0 8px 32px rgba(31, 38, 135, 0.37)",
           }}
         >
           <CardContent>
@@ -71,7 +78,7 @@ const PaymentSuccessModal = ({ open, onClose }) => {
             <CheckCircleOutlineIcon
               sx={{
                 fontSize: 80,
-                color: "#4caf50",
+                color: theme.palette.mode === "dark" ? "#66bb6a" : "#4caf50",
                 animation: "pulse 2s infinite",
                 "@keyframes pulse": {
                   "0%": { transform: "scale(1)" },

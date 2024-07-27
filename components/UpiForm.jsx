@@ -52,11 +52,10 @@ const UpiForm = ({ onPaymentSuccess }) => {
       }
     }
 
-    // Randomly decide success or failure
     const isSuccess = Math.random() < 0.5;
     if (isSuccess) {
       dispatch(setPaymentMethod("UPI"));
-      onPaymentSuccess(); // Call the function to open the success modal
+      onPaymentSuccess();
     } else {
       setError("Payment failed. Please try again.");
     }

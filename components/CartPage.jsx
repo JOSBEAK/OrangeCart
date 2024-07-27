@@ -9,7 +9,6 @@ import headingStyle from "@/styles/headingStyle";
 
 const CartPage = ({ handleNext, isButtonDisabled }) => {
   const { items, status } = useSelector((state) => state.cart);
-  const isCartEmpty = items.length === 0;
   const dispatch = useDispatch();
   useEffect(() => {
     if (status !== "succeeded") {

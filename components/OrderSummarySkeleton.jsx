@@ -8,8 +8,6 @@ import {
   ListItemText,
   Divider,
   Skeleton,
-  Chip,
-  Typography,
   Grid,
   Card,
   CardContent,

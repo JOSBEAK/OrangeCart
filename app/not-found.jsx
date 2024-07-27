@@ -42,7 +42,7 @@ export default function NotFound() {
       </Typography>
       <Button
         component={Link}
-        href="/checkout?current=bag"
+        href="/checkout"
         variant="contained"
         sx={{
           marginTop: 2,

@@ -1,4 +1,3 @@
-// components/ItemCard.jsx
 import React from "react";
 import Image from "next/image";
 import { Box, Card, CardContent, Typography, Chip } from "@mui/material";
@@ -34,9 +33,6 @@ const ItemCard = ({ item, minimal = false }) => {
           color="primary"
           variant="outlined"
         />
-        {/* {!minimal && (
-          // Add any additional content for the full version
-        )} */}
       </CardContent>
     </Card>
   );

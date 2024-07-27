@@ -13,7 +13,6 @@ import {
   ListItemText,
   Avatar,
   Chip,
-  CircularProgress,
   Grid,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -25,12 +24,10 @@ import OrderSummarySkeleton from "./OrderSummarySkeleton";
 import dynamic from "next/dynamic";
 import LoadingSpinner from "./LoadingSpinner";
 
-// Dynamic import with custom loading component
 const ItemCard = dynamic(() => import("./ItemCard"), {
   loading: () => <LoadingSpinner />,
 });
 
-// Remove the theme prop as it should be provided by a parent ThemeProvider
 const OrderSummary = () => {
   const { items, total, discountedTotal, status, error } = useSelector(
     (state) => state.cart

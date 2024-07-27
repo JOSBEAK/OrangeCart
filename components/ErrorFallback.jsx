@@ -1,4 +1,3 @@
-// components/ErrorFallback.jsx
 import { Box, Typography, Button } from "@mui/material";
 
 const ErrorFallback = ({ error, resetErrorBoundary }) => {

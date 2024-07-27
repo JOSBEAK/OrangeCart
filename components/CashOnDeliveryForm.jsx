@@ -15,8 +15,6 @@ const CashOnDeliveryForm = () => {
       <Button
         variant="contained"
         color="primary"
-        component={Link}
-        href="/checkout?current=confirmation"
         sx={{
           mt: 2,
           backgroundColor: "black",

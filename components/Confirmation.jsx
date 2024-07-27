@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
   Paper,
   Grid,
-  ThemeProvider,
-  createTheme,
   Button,
   Container,
   Fade,
@@ -21,18 +18,15 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { resetCart } from "@/lib/slices/cartSlice";
-// import { useRouteProtection } from "@/hooks/useRouteProtection";
+import { useRouter } from "next/navigation";
 
-const ConfirmationContent = () => {
+const ConfirmationComponent = () => {
   const { discountedTotal, address, paymentMethod } = useSelector(
     (state) => state.cart
   );
-  const router = useRouter();
-
   const dispatch = useDispatch();
-  // const { resetProgress } = useRouteProtection();
   const theme = useTheme();
-
+  const router = useRouter();
   useEffect(() => {
     history.pushState(null, null, location.href);
     window.onpopstate = function () {
@@ -41,14 +35,20 @@ const ConfirmationContent = () => {
     return () => {
       window.onpopstate = null;
     };
-  }, [dispatch]);
+  }, []);
 
+  const handleContinueShopping = () => {
+    router.push("/");
+    setTimeout(() => {
+      dispatch(resetCart());
+    }, 100);
+  };
   return (
     <Box
       sx={{
         flexGrow: 1,
         margin: "auto",
-        backgroundColor: "background.default",
+        backgroundColor: theme.palette.background.default,
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
@@ -78,55 +78,42 @@ const ConfirmationContent = () => {
               <Grid item>
                 {paymentMethod === "UPI" || paymentMethod === "Card" ? (
                   <Typography variant="h4" gutterBottom align="center">
-                    Payment Successful! Payment Method : {paymentMethod}
+                    Payment Successful! Payment Method: {paymentMethod}
                   </Typography>
                 ) : (
                   <>
                     <Typography variant="h4" gutterBottom align="center">
                       Order Confirmed!
                     </Typography>
-                    <Typography variant="h7" gutterBottom align="center">
-                      Payment Method : {paymentMethod}
+                    <Typography variant="subtitle1" gutterBottom align="center">
+                      Payment Method: {paymentMethod}
                     </Typography>
                   </>
                 )}
               </Grid>
               <Grid item>
-                {paymentMethod === "UPI" || paymentMethod === "Card" ? (
-                  <Typography
-                    variant="h6"
-                    align="center"
-                    color="text.secondary"
-                  >
-                    Your payment of{" "}
-                    <Box component="span" fontWeight="bold">
-                      ${discountedTotal}
-                    </Box>{" "}
-                    has been processed successfully.
-                  </Typography>
-                ) : (
-                  <Typography
-                    variant="h6"
-                    align="center"
-                    color="text.secondary"
-                  >
-                    Please pay{" "}
-                    <Box component="span" fontWeight="bold">
-                      ${discountedTotal}
-                    </Box>{" "}
-                    to the delivery agent for Order.
-                  </Typography>
-                )}
+                <Typography variant="h6" align="center" color="text.secondary">
+                  {paymentMethod === "UPI" || paymentMethod === "Card"
+                    ? `Your payment of `
+                    : `Please pay `}
+                  <Box component="span" fontWeight="bold">
+                    ${discountedTotal}
+                  </Box>
+                  {paymentMethod === "UPI" || paymentMethod === "Card"
+                    ? ` has been processed successfully.`
+                    : ` to the delivery agent for Order.`}
+                </Typography>
               </Grid>
               <Grid item sx={{ width: "100%" }}>
                 <Divider sx={{ my: 2 }} />
               </Grid>
+
               <Grid
                 item
                 container
                 direction="column"
-                alignItems="center"
                 spacing={2}
+                sx={{ width: "100%" }}
               >
                 <Grid item>
                   <Box
@@ -134,55 +121,71 @@ const ConfirmationContent = () => {
                       display: "flex",
                       alignItems: "center",
                       mb: 2,
+                      justifyContent: "center",
                     }}
                   >
-                    <LocalShippingIcon color="primary" sx={{ mr: 0.5 }} />
+                    <LocalShippingIcon color="primary" sx={{ mr: 1 }} />
                     <Typography variant="h6" fontWeight={700}>
                       Delivery Address
                     </Typography>
                   </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{ lineHeight: 1.6, textAlign: "center" }}
-                  >
-                    <Box component="span" fontWeight="bold">
-                      {address.firstName} {address.lastName}
-                    </Box>
-                    <br />
-                    {address.streetAddress}
-                    {address.landmark && (
-                      <>
-                        <br />
-                        {address.landmark}
-                      </>
-                    )}
-                    <br />
-                    {address.city}, {address.state} {address.pincode}
-                    <br />
-                    {address.country}
-                    <br />
-                    Phone:{" "}
-                    <Box component="span" fontWeight="bold">
-                      {address.mobileNumber}
-                    </Box>
-                  </Typography>
                 </Grid>
                 <Grid item>
                   <Box
                     sx={{
                       bgcolor:
                         theme.palette.mode === "dark"
-                          ? "primary.dark"
-                          : "primary.light",
+                          ? theme.palette.grey[800]
+                          : theme.palette.grey[100],
+                      p: 3,
+                      borderRadius: 2,
+                      maxWidth: "100%",
+                      margin: "auto",
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{ lineHeight: 1.6, textAlign: "center" }}
+                    >
+                      <Box component="span" fontWeight="bold">
+                        {address.firstName} {address.lastName}
+                      </Box>
+                      <br />
+                      {address.streetAddress}
+                      {address.landmark && (
+                        <>
+                          <br />
+                          {address.landmark}
+                        </>
+                      )}
+                      <br />
+                      {address.city}, {address.state} {address.pincode}
+                      <br />
+                      {address.country}
+                      <br />
+                      Phone:{" "}
+                      <Box component="span" fontWeight="bold">
+                        {address.mobileNumber}
+                      </Box>
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item>
+                  <Box
+                    sx={{
+                      bgcolor:
+                        theme.palette.mode === "dark"
+                          ? theme.palette.primary.dark
+                          : theme.palette.primary.light,
                       p: 2,
                       borderRadius: 2,
-                      maxWidth: "400px",
+                      maxWidth: "100%",
                       margin: "auto",
                     }}
                   >
                     <Typography
                       variant="body2"
-                      color="primary.contrastText"
+                      color={theme.palette.primary.contrastText}
                       align="center"
                     >
                       Your order will be delivered within 3-5 business days. You
@@ -196,23 +199,21 @@ const ConfirmationContent = () => {
                   variant="contained"
                   color="primary"
                   size="large"
-                  component={Link}
-                  href="/"
                   sx={{
                     px: 4,
                     py: 1.5,
                     borderRadius: 1,
                     boxShadow: 3,
-                    backgroundColor: "#FF8C00", // darker orange color on hover
-                    color: "#fff", // white text color
+                    backgroundColor: "#FF8C00",
+                    color: "#fff",
                     "&:hover": {
                       transform: "translateY(-2px)",
-                      backgroundColor: "#FFA500", // mid orange color
+                      backgroundColor: "#FFA500",
                       boxShadow: 5,
                     },
                     transition: "all 0.3s",
                   }}
-                  onClick={() => dispatch(resetCart())}
+                  onClick={handleContinueShopping}
                 >
                   Continue Shopping
                 </Button>
@@ -225,38 +226,4 @@ const ConfirmationContent = () => {
   );
 };
 
-// Wrapper component to provide theme
-const DarkModeConfirmation = () => {
-  const theme = useTheme();
-
-  const darkModeTheme = useMemo(
-    () =>
-      createTheme({
-        ...theme,
-        palette: {
-          ...theme.palette,
-          mode: theme.palette.mode,
-          primary: {
-            main: theme.palette.mode === "dark" ? "#81C784" : "#4CAF50",
-          },
-          background: {
-            default: theme.palette.mode === "dark" ? "#121212" : "#f5f5f5",
-            paper: theme.palette.mode === "dark" ? "#1E1E1E" : "#ffffff",
-          },
-          text: {
-            primary: theme.palette.mode === "dark" ? "#ffffff" : "#000000",
-            secondary: theme.palette.mode === "dark" ? "#B0BEC5" : "#757575",
-          },
-        },
-      }),
-    [theme]
-  );
-
-  return (
-    <ThemeProvider theme={darkModeTheme}>
-      <ConfirmationContent />
-    </ThemeProvider>
-  );
-};
-
-export default DarkModeConfirmation;
+export default ConfirmationComponent;

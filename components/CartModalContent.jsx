@@ -72,7 +72,7 @@ const CartModalContent = ({ open, handleClose }) => {
       <List sx={{ maxHeight: 300, overflowY: "auto", scrollbarWidth: "none" }}>
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
-            <StyledListItem alignItems="flex-start">
+            <StyledListItem alignItems="center">
               <ListItemAvatar>
                 {open && (
                   <StyledImage
@@ -90,9 +90,8 @@ const CartModalContent = ({ open, handleClose }) => {
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                  >{`Quantity: ${item.quantity} • ₹${item.price.toFixed(
-                    2
-                  )}`}</Typography>
+                    fontWeight={600}
+                  >{`  ₹${item.price.toFixed(2)}`}</Typography>
                 }
               />
               <Badge badgeContent={item.quantity} color="secondary">
@@ -109,7 +108,7 @@ const CartModalContent = ({ open, handleClose }) => {
         <StyledButton
           variant="contained"
           component={Link}
-          href="/checkout?current=bag"
+          href="/checkout"
           onClick={handleClose}
           fullWidth
           startIcon={<ShoppingCartIcon />}

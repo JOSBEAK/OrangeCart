@@ -118,7 +118,7 @@ const CartItems = ({ items, isLoading }) => {
               </Box>
               <Box
                 display="flex"
-                justifyContent="space-between"
+                justifyContent="space-around"
                 alignItems="center"
                 mt={isMobile ? 1 : 2}
               >
@@ -131,7 +131,7 @@ const CartItems = ({ items, isLoading }) => {
                       : isTablet
                       ? "1.1rem"
                       : "1.25rem",
-                    flexGrow: 1,
+                    flexGrow: 0.5,
                   }}
                 >
                   ₹{item.price.toFixed(2)}
