@@ -34,6 +34,8 @@ const AddressForm = ({ formRef }) => {
           validationSchema={validationSchema}
           innerRef={formRef}
           onSubmit={handleSubmit}
+          validateOnChange
+          validateOnMount
         >
           <FormFields />
         </Formik>
