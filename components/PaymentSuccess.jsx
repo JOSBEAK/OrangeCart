@@ -53,11 +53,12 @@ const PaymentSuccessModal = ({ open, onClose }) => {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
+          padding: 2, // Add padding for smaller screens
         }}
       >
         <Card
           sx={{
-            maxWidth: 400,
+            maxWidth: "100%", // Make the card full width on smaller screens
             textAlign: "center",
             padding: 4,
             backgroundColor:
@@ -69,15 +70,21 @@ const PaymentSuccessModal = ({ open, onClose }) => {
               theme.palette.mode === "dark"
                 ? "0 8px 32px rgba(255, 255, 255, 0.1)"
                 : "0 8px 32px rgba(31, 38, 135, 0.37)",
+            borderRadius: 2, // Add border radius for a smoother look
           }}
         >
           <CardContent>
-            <Typography variant="h4" component="h2" gutterBottom>
+            <Typography
+              variant="h4"
+              component="h2"
+              gutterBottom
+              sx={{ fontSize: "1.5rem" }} // Reduce font size for smaller screens
+            >
               Payment Successful
             </Typography>
             <CheckCircleOutlineIcon
               sx={{
-                fontSize: 80,
+                fontSize: 60, // Reduce icon size for smaller screens
                 color: theme.palette.mode === "dark" ? "#66bb6a" : "#4caf50",
                 animation: "pulse 2s infinite",
                 "@keyframes pulse": {
@@ -87,7 +94,10 @@ const PaymentSuccessModal = ({ open, onClose }) => {
                 },
               }}
             />
-            <Typography variant="body1" sx={{ mt: 2, mb: 3 }}>
+            <Typography
+              variant="body1"
+              sx={{ mt: 2, mb: 3, fontSize: "0.875rem" }} // Reduce font size for smaller screens
+            >
               Thank you! Your payment has been processed successfully.
             </Typography>
             <Box
@@ -101,12 +111,19 @@ const PaymentSuccessModal = ({ open, onClose }) => {
                 variant="contained"
                 color="primary"
                 onClick={handleContinue}
-                sx={{ mb: 3 }}
+                sx={{ mb: 3, fontSize: "0.875rem" }} // Reduce font size for smaller screens
               >
                 Close
               </Button>
             </Box>
-            <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 2,
+                color: "text.secondary",
+                fontSize: "0.75rem", // Reduce font size for smaller screens
+              }}
+            >
               This modal will close in {countdown} seconds...
             </Typography>
           </CardContent>
