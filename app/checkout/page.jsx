@@ -1,29 +1,31 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import dynamic from "next/dynamic";
 import {
   Box,
-  Button,
   Container,
   Step,
   StepLabel,
   Stepper,
-  Typography,
+  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import OrderSummary from "@/components/OrderSummary";
-import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import PaymentIcon from "@mui/icons-material/Payment";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-
+import {
+  ShoppingBag,
+  LocalShipping,
+  Payment,
+  CheckCircle,
+} from "@mui/icons-material";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import OrderSummary from "@/components/OrderSummary";
+import PaymentSuccessModal from "@/components/PaymentSuccess";
+import { setActiveStep } from "@/lib/slices/cartSlice";
 
 const OrangeConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -70,7 +72,6 @@ const OrangeStepIconRoot = styled("div")(({ theme, ownerState }) => ({
 
 function OrangeStepIcon(props) {
   const { active, completed, className, icon } = props;
-
   return (
     <OrangeStepIconRoot
       ownerState={{ completed, active }}
@@ -80,85 +81,67 @@ function OrangeStepIcon(props) {
     </OrangeStepIconRoot>
   );
 }
-const TransitionWrapper = styled("div")`
-  transition: opacity 0.5s ease-in-out;
-  opacity: ${(props) => (props.visible ? 1 : 0)};
-`;
 
 const CartPage = dynamic(() => import("@/components/CartPage"), {
-  loading: () => <LoadingFallback />,
+  loading: () => <LoadingSpinner />,
 });
-
-const Confirmation = dynamic(() => import("@/components/Confirmation"), {
-  loading: () => <LoadingFallback />,
-});
-
 const AddressForm = dynamic(() => import("@/components/AddressForm"), {
-  loading: () => <LoadingFallback />,
+  loading: () => <LoadingSpinner />,
 });
-
 const PaymentForm = dynamic(() => import("@/components/PaymentForm"), {
-  loading: () => <LoadingFallback />,
+  loading: () => <LoadingSpinner />,
+});
+const Confirmation = dynamic(() => import("@/components/Confirmation"), {
+  loading: () => <LoadingSpinner />,
 });
 
-const ErrorFallback = dynamic(() => import("@/components/ErrorFallback"), {
-  loading: () => <LoadingFallback />,
-});
-
-function LoadingFallback() {
-  return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="50vh"
-    >
-      <LoadingSpinner />
-    </Box>
-  );
-}
+const steps = [
+  { label: "Bag", icon: ShoppingBag },
+  { label: "Delivery", icon: LocalShipping },
+  { label: "Payment", icon: Payment },
+  { label: "Confirmation", icon: CheckCircle },
+];
 
 export default function CheckoutPage() {
-  const [activeStep, setActiveStep] = useState(0);
-  const { items } = useSelector((state) => state.cart);
-  const [isVisible, setIsVisible] = useState(true);
-  const [disableButtonOnEachPage, setDisableButtonOnEachPage] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const { items, isAddressAdded, isPaymentDone, activeStep } = useSelector(
+    (state) => state.cart
+  );
+  const [isFormValid, setIsFormValid] = useState(false);
+  const formRef = useRef();
+  const dispatch = useDispatch();
 
   const handleNext = () => {
-    if (activeStep === steps.length - 1) setActiveStep(0);
-    else setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    if (activeStep === 1 && formRef.current) {
+      formRef.current.handleSubmit();
+    }
+    dispatch(
+      setActiveStep(activeStep === steps.length - 1 ? 0 : activeStep + 1)
+    );
   };
 
-  const disableAccordingToStep = () => {
-    console.log(activeStep, disableButtonOnEachPage);
+  const handleBack = () => {
+    dispatch(setActiveStep(activeStep - 1));
+  };
 
+  const isButtonDisabled = () => {
     if (items.length === 0) return true;
-    else {
-      return disableButtonOnEachPage;
-    }
+    if (activeStep === 1) return !isAddressAdded;
+    if (activeStep === 2) return !isPaymentDone;
+    return false;
   };
 
   useEffect(() => {
-    disableAccordingToStep();
-  }, []);
+    console.log("Form validity changed:", isFormValid);
+  }, [isFormValid]);
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  useEffect(() => {
+    if (activeStep === 2) dispatch(setActiveStep(3));
+  }, [isPaymentDone]);
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  const steps = [
-    { label: "Bag", icon: ShoppingBagIcon },
-    { label: "Delivery", icon: LocalShippingIcon },
-    { label: "Payment", icon: PaymentIcon },
-    { label: "Confirmation", icon: CheckCircleIcon },
-  ];
-
-  const returnButtonText = () => {
-    return `Proceed to ${steps[activeStep + 1].label}`;
+  const handlePaymentSuccess = () => {
+    setIsSuccessModalOpen(true);
+    dispatch(setActiveStep(3)); // Move to the confirmation step
   };
 
   const renderStep = () => {
@@ -167,12 +150,10 @@ export default function CheckoutPage() {
         return <CartPage />;
       case 1:
         return (
-          <AddressForm
-            setDisableButtonOnEachPage={setDisableButtonOnEachPage}
-          />
+          <AddressForm setIsFormValid={setIsFormValid} formRef={formRef} />
         );
       case 2:
-        return <PaymentForm />;
+        return <PaymentForm onPaymentSuccess={handlePaymentSuccess} />;
       case 3:
         return <Confirmation />;
       default:
@@ -181,84 +162,68 @@ export default function CheckoutPage() {
   };
 
   return (
-    <ErrorBoundary fallback={<ErrorFallback />}>
+    <ErrorBoundary>
       <Container>
-        <TransitionWrapper visible={isVisible}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            padding: 2,
+            position: "relative",
+          }}
+        >
           <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              padding: 2,
-              position: "relative",
-            }}
+            sx={{ width: "100%", maxWidth: 600, alignSelf: "center", mb: 4 }}
           >
-            <Box sx={{ width: "100%", maxWidth: 600, alignSelf: "center" }}>
-              <Box sx={{ width: "100%", mb: 4 }}>
-                <Stepper
-                  activeStep={activeStep}
-                  connector={<OrangeConnector />}
-                  alternativeLabel
-                >
-                  {steps.map((step, index) => (
-                    <Step key={step.label}>
-                      <StepLabel
-                        StepIconComponent={OrangeStepIcon}
-                        icon={<step.icon />}
-                      >
-                        {step.label}
-                      </StepLabel>
-                    </Step>
-                  ))}
-                </Stepper>
-              </Box>
-            </Box>
+            <Stepper
+              activeStep={activeStep}
+              connector={<OrangeConnector />}
+              alternativeLabel
+            >
+              {steps.map((step) => (
+                <Step key={step.label}>
+                  <StepLabel
+                    StepIconComponent={OrangeStepIcon}
+                    icon={<step.icon />}
+                  >
+                    {step.label}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
           </Box>
-        </TransitionWrapper>
+        </Box>
         <Box
           sx={{ display: "flex", flexDirection: { xs: "column", md: "row" } }}
         >
           <Box sx={{ flex: 1, marginRight: { md: 2 } }}>
-            {activeStep === steps.length ? (
-              <>
-                <Typography sx={{ mt: 2, mb: 1 }}>
-                  All steps completed - you&apos;re finished
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                  <Box sx={{ flex: "1 1 auto" }} />
-                  <Button onClick={handleReset}>Reset</Button>
-                </Box>
-              </>
-            ) : (
-              <>
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                  {activeStep === 0 || activeStep === steps.length - 1 ? (
-                    <></>
-                  ) : (
-                    <Button color="inherit" onClick={handleBack} sx={{ mr: 1 }}>
-                      Back
-                    </Button>
-                  )}
-                  <Box sx={{ flex: "1 1 auto" }} />
-                  <Button
-                    onClick={handleNext}
-                    disabled={() => disableAccordingToStep()}
-                  >
-                    {activeStep === steps.length - 1
-                      ? "Reset"
-                      : returnButtonText()}
-                  </Button>
-                </Box>
-                {renderStep()}
-              </>
-            )}
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}
+            >
+              {activeStep > 0 && activeStep < steps.length - 1 && (
+                <Button color="inherit" onClick={handleBack}>
+                  Back
+                </Button>
+              )}
+              {activeStep < steps.length - 1 && (
+                <Button onClick={handleNext} disabled={isButtonDisabled()}>
+                  {`Proceed to ${steps[activeStep + 1].label}`}
+                </Button>
+              )}
+            </Box>
+            {renderStep()}
           </Box>
-          {items.length !== 0 && (
+          {items.length > 0 && (
             <Box sx={{ flex: 1, mt: { xs: 4, md: 0 } }}>
               <OrderSummary />
             </Box>
           )}
         </Box>
       </Container>
+      <PaymentSuccessModal
+        open={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+      />
     </ErrorBoundary>
   );
 }

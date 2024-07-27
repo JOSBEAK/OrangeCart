@@ -20,6 +20,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { resetCart } from "@/lib/slices/cartSlice";
 // import { useRouteProtection } from "@/hooks/useRouteProtection";
 
 const ConfirmationContent = () => {
@@ -211,6 +212,7 @@ const ConfirmationContent = () => {
                     },
                     transition: "all 0.3s",
                   }}
+                  onClick={() => dispatch(resetCart())}
                 >
                   Continue Shopping
                 </Button>

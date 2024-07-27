@@ -34,7 +34,7 @@ const CashOnDeliveryForm = dynamic(() => import("./CashOnDeliveryForm"), {
   ssr: false,
 });
 
-const PaymentForm = () => {
+const PaymentForm = ({ onPaymentSuccess }) => {
   const [clientSecret, setClientSecret] = useState("");
   const [expanded, setExpanded] = useState(false);
   const [loadUPI, setLoadUPI] = useState(false);
@@ -83,7 +83,7 @@ const PaymentForm = () => {
         <AccordionDetails>
           {loadUPI && (
             <Suspense fallback={<LoadingSpinner />}>
-              <UPIForm />
+              <UPIForm onPaymentSuccess={onPaymentSuccess} />
             </Suspense>
           )}
         </AccordionDetails>
@@ -99,6 +99,7 @@ const PaymentForm = () => {
               <CardPaymentForm
                 clientSecret={clientSecret}
                 stripePromise={stripePromise}
+                onPaymentSuccess={onPaymentSuccess}
               />
             </Suspense>
           )}

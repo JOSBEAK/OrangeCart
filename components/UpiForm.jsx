@@ -9,15 +9,13 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 import { setPaymentMethod } from "@/lib/slices/cartSlice";
 import { useDispatch } from "react-redux";
 
-const UPIForm = () => {
+const UPIForm = ({ onPaymentSuccess }) => {
   const [upiOption, setUpiOption] = useState("vpa");
   const [vpa, setVpa] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
   const dispatch = useDispatch();
 
   const upiHandles = [
@@ -56,11 +54,12 @@ const UPIForm = () => {
 
     // Randomly decide success or failure
     const isSuccess = Math.random() < 0.5;
-    const status = isSuccess ? "success" : "failure";
-    if (status === "success") {
+    if (isSuccess) {
       dispatch(setPaymentMethod("UPI"));
+      onPaymentSuccess(); // Call the function to open the success modal
+    } else {
+      setError("Payment failed. Please try again.");
     }
-    router.push(`/payment-result?status=${status}`);
   };
 
   return (
