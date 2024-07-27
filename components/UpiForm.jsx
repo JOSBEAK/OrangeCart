@@ -12,7 +12,7 @@ import {
 import { setPaymentMethod } from "@/lib/slices/cartSlice";
 import { useDispatch } from "react-redux";
 
-const UPIForm = ({ onPaymentSuccess }) => {
+const UpiForm = ({ onPaymentSuccess }) => {
   const [upiOption, setUpiOption] = useState("vpa");
   const [vpa, setVpa] = useState("");
   const [error, setError] = useState("");
@@ -114,4 +114,4 @@ const UPIForm = ({ onPaymentSuccess }) => {
   );
 };
 
-export default UPIForm;
+export default UpiForm;

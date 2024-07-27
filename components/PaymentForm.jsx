@@ -21,7 +21,7 @@ const stripePromise = loadStripe(
 );
 
 // Lazy load payment components
-const UPIForm = dynamic(() => import("./UPIForm"), {
+const UpiForm = dynamic(() => import("./UpiForm"), {
   loading: () => <LoadingSpinner />,
   ssr: false,
 });
@@ -83,7 +83,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
         <AccordionDetails>
           {loadUPI && (
             <Suspense fallback={<LoadingSpinner />}>
-              <UPIForm onPaymentSuccess={onPaymentSuccess} />
+              <UpiForm onPaymentSuccess={onPaymentSuccess} />
             </Suspense>
           )}
         </AccordionDetails>
