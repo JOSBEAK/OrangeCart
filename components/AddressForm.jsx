@@ -44,7 +44,7 @@ const validationSchema = Yup.object().shape({
   landmark: Yup.string(),
 });
 
-const AddressForm = ({ setIsFormValid, formRef }) => {
+const AddressForm = ({ formRef }) => {
   const dispatch = useDispatch();
 
   return (
@@ -68,9 +68,6 @@ const AddressForm = ({ setIsFormValid, formRef }) => {
           innerRef={formRef}
         >
           {({ errors, touched, isValid, dirty, handleSubmit }) => {
-            useEffect(() => {
-              setIsFormValid(isValid && dirty);
-            }, [isValid, dirty, setIsFormValid]);
             return (
               <Form>
                 <Grid container spacing={3}>
