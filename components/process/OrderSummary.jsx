@@ -1,8 +1,3 @@
-"use client";
-
-import React, { useEffect, useState, Suspense } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
 import {
   Box,
   Typography,
@@ -13,41 +8,22 @@ import {
   ListItemText,
   Avatar,
   Chip,
-  Grid,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import DiscountIcon from "@mui/icons-material/Discount";
 import ReceiptIcon from "@mui/icons-material/Receipt";
-import { useSearchParams } from "next/navigation";
+
 import OrderSummarySkeleton from "./OrderSummarySkeleton";
-import dynamic from "next/dynamic";
-import LoadingSpinner from "./LoadingSpinner";
 
-const ItemCard = dynamic(() => import("./ItemCard"), {
-  loading: () => <LoadingSpinner />,
-});
+const OrderSummary = ({
+  total,
+  discountedTotal,
 
-const OrderSummary = () => {
-  const { items, total, discountedTotal, status, error, activeStep } =
-    useSelector((state) => state.cart);
-  const searchParams = useSearchParams();
-  const currentPage = searchParams.get("current");
-  const [showItems, setShowItems] = useState(false);
-  const [loadItems, setLoadItems] = useState(false);
-
-  useEffect(() => {
-    if (items.length > 0) {
-      console.log("Setting showItems and loadItems to true", items.length);
-      setShowItems(true);
-      setLoadItems(true);
-    }
-    if (activeStep === 0 || items.length === 0) {
-      setShowItems(false);
-    }
-  }, [currentPage, activeStep]);
-
-  if (status === "loading") {
+  status,
+  error,
+}) => {
+  if (total === 0) {
     return <OrderSummarySkeleton />;
   }
 
@@ -93,7 +69,7 @@ const OrderSummary = () => {
           <SummaryItem
             icon={<LocalShippingIcon />}
             label="Delivery Fee"
-            value={deliveryFee}
+            value={total === 0 ? 0 : deliveryFee}
           />
           <SummaryItem
             icon={<DiscountIcon />}
@@ -119,7 +95,7 @@ const OrderSummary = () => {
       </Paper>
 
       <Chip
-        label="10% Discount Applied for New Users"
+        label={`10% Discount Applied for New Users`}
         color="secondary"
         icon={<DiscountIcon />}
         sx={{
@@ -130,22 +106,6 @@ const OrderSummary = () => {
           fontWeight: "bold",
         }}
       />
-
-      {showItems && (
-        <Suspense fallback={<LoadingSpinner />}>
-          <Typography variant="h6" gutterBottom sx={{ mt: 4, mb: 2 }}>
-            Items in Your Cart
-          </Typography>
-          <Grid container spacing={2}>
-            {loadItems &&
-              items.map((item) => (
-                <Grid item xs={12} sm={6} md={4} key={item.id}>
-                  <ItemCard item={item} minimal={true} />
-                </Grid>
-              ))}
-          </Grid>
-        </Suspense>
-      )}
     </Box>
   );
 };

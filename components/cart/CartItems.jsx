@@ -88,7 +88,7 @@ const CartItems = ({ items, isLoading }) => {
                 fill
                 sizes="(max-width: 600px) 100px, 150px"
                 style={{ objectFit: "cover" }}
-                priority
+                loading="lazy"
               />
             </Box>
             <CardContent

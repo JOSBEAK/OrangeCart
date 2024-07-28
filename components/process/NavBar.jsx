@@ -9,9 +9,9 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../misc/LoadingSpinner";
 
-const CartModal = dynamic(() => import("./CartModal"));
+const CartModal = dynamic(() => import("../cart/CartModal"));
 
 const NavBar = ({ mode, toggleTheme }) => {
   const router = useRouter();

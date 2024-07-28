@@ -4,16 +4,11 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import {
-  Button,
-  Typography,
-  useTheme,
-  Box,
-  CircularProgress,
-} from "@mui/material";
+import { Button, Typography, useTheme, Box } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { setPaymentMethod } from "@/lib/slices/cartSlice";
-import PaymentSuccessModal from "@/components/PaymentSuccess";
+import PaymentSuccessModal from "@/components/payment/PaymentSuccess";
+import LoadingSpinner from "../misc/LoadingSpinner";
 
 const StripeCheckoutForm = ({ onPaymentSuccess }) => {
   const stripe = useStripe();
@@ -84,11 +79,7 @@ const StripeCheckoutForm = ({ onPaymentSuccess }) => {
             width: "100%",
           }}
         >
-          {processing ? (
-            <CircularProgress size={24} color="inherit" />
-          ) : (
-            "Pay Now"
-          )}
+          {processing ? <LoadingSpinner /> : "Pay Now"}
         </Button>
       </form>
       {error && (

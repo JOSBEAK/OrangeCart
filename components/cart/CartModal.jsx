@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Popover, Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "@/lib/slices/cartSlice";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../misc/LoadingSpinner";
 
 const CartModalContent = dynamic(() => import("./CartModalContent"), {
   loading: () => <LoadingSpinner />,

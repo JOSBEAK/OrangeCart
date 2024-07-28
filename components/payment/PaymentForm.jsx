@@ -13,7 +13,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockIcon from "@mui/icons-material/Lock";
 import dynamic from "next/dynamic";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../misc/LoadingSpinner";
 import headingStyle from "@/styles/headingStyle";
 
 const stripePromise = loadStripe(

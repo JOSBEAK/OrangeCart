@@ -1,18 +1,21 @@
 import dynamic from "next/dynamic";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingSpinner from "@/components/misc/LoadingSpinner";
 
-const CartPage = dynamic(() => import("@/components/CartPage"), {
+const CartPage = dynamic(() => import("@/components/cart/CartPage"), {
   loading: () => <LoadingSpinner />,
 });
-const AddressForm = dynamic(() => import("@/components/AddressForm"), {
+const AddressForm = dynamic(() => import("@/components/address/AddressForm"), {
   loading: () => <LoadingSpinner />,
 });
-const PaymentForm = dynamic(() => import("@/components/PaymentForm"), {
+const PaymentForm = dynamic(() => import("@/components/payment/PaymentForm"), {
   loading: () => <LoadingSpinner />,
 });
-const Confirmation = dynamic(() => import("@/components/Confirmation"), {
-  loading: () => <LoadingSpinner />,
-});
+const Confirmation = dynamic(
+  () => import("@/components/process/Confirmation"),
+  {
+    loading: () => <LoadingSpinner />,
+  }
+);
 
 export function renderStep({
   activeStep,

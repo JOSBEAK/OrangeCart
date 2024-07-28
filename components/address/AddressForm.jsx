@@ -6,7 +6,10 @@ import { Box, Paper, Typography } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useDispatch } from "react-redux";
 import { setAddress, setAddressValid } from "@/lib/slices/cartSlice";
-import { initialValues, validationSchema } from "../config/addressFormConfig";
+import {
+  initialValues,
+  validationSchema,
+} from "../../config/addressFormConfig.js";
 import FormFields from "./FormFields.jsx";
 import headingStyle from "@/styles/headingStyle";
 

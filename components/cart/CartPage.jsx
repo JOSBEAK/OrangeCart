@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { Container, Typography, Box, Button } from "@mui/material";
-import CartItems from "../components/CartItems";
+import CartItems from "./CartItems";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "@/lib/slices/cartSlice";
 import buttonStyle from "@/styles/buttonStyle";

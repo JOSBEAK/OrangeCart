@@ -3,21 +3,29 @@
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Container } from "@mui/material";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import OrderSummary from "@/components/OrderSummary";
-import PaymentSuccessModal from "@/components/PaymentSuccess";
+import ErrorBoundary from "@/components/misc/ErrorBoundary";
+import OrderSummary from "@/components/process/OrderSummary";
+import PaymentSuccessModal from "@/components/payment/PaymentSuccess";
 import { setActiveStep } from "@/lib/slices/cartSlice";
-import CheckoutStepper from "@/components/CheckoutStepper";
+import CheckoutStepper from "@/components/process/CheckoutStepper";
 
-import { renderStep } from "@/components/StepComponent";
+import { renderStep } from "@/components/process/StepComponent";
 
-import CheckoutButtons from "@/components/CheckOutButton";
+import CheckoutButtons from "@/components/process/CheckOutButton";
 
 export default function CheckoutPage() {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const { items, isAddressAdded, isPaymentDone, activeStep } = useSelector(
-    (state) => state.cart
-  );
+  const {
+    items,
+    isAddressAdded,
+    isPaymentDone,
+    activeStep,
+    total,
+    discountedTotal,
+
+    status,
+    error,
+  } = useSelector((state) => state.cart);
   const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef();
   const dispatch = useDispatch();
@@ -41,7 +49,7 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
-    if (activeStep === 2) dispatch(setActiveStep(3));
+    if (activeStep === 2 && isPaymentDone) dispatch(setActiveStep(3));
   }, [isPaymentDone]);
 
   const handlePaymentSuccess = () => {
@@ -74,11 +82,16 @@ export default function CheckoutPage() {
               onPaymentSuccess: handlePaymentSuccess,
             })}
           </Box>
-          {items.length > 0 && (
+          {
             <Box sx={{ flex: 1, mt: { xs: 4, md: 0 } }}>
-              <OrderSummary />
+              <OrderSummary
+                total={total}
+                discountedTotal={discountedTotal}
+                status={status}
+                error={error}
+              />
             </Box>
-          )}
+          }
         </Box>
       </Container>
       <PaymentSuccessModal

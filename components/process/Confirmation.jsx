@@ -58,7 +58,6 @@ const ConfirmationComponent = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        paddingTop: 4,
       }}
     >
       <Container

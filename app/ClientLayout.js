@@ -4,10 +4,10 @@ import { useState, useEffect, useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import ErrorFallback from "@/components/ErrorFallback";
+import ErrorBoundary from "@/components/misc/ErrorBoundary";
+import ErrorFallback from "@/components/misc/ErrorFallback";
 import ClientProvider from "./ClientProvider";
-import NavBar from "@/components/NavBar";
+import NavBar from "@/components/process/NavBar";
 
 export default function ClientLayout({ children }) {
   const [mode, setMode] = useState("light");

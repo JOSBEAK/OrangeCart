@@ -33,11 +33,6 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
   },
 }));
 
-const StyledImage = styled(Image)({
-  borderRadius: "50%",
-  objectFit: "cover",
-});
-
 const StyledButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.secondary.main,
   color: theme.palette.common.white,
@@ -75,11 +70,19 @@ const CartModalContent = ({ open, handleClose }) => {
             <StyledListItem alignItems="center">
               <ListItemAvatar>
                 {open && (
-                  <StyledImage
+                  // <StyledImage
+                  //   src={item.thumbnail}
+                  //   alt={item.title}
+                  //   width={50}
+                  //   height={50}
+                  //   loading="lazy"
+                  // />
+                  <Image
                     src={item.thumbnail}
                     alt={item.title}
                     width={50}
                     height={50}
+                    style={{ objectFit: "cover" }}
                     loading="lazy"
                   />
                 )}
