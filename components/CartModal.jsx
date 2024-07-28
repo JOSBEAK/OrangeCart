@@ -17,7 +17,9 @@ const CartModal = ({ open, anchorEl, handleClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (status !== "succeeded") dispatch(fetchCart());
+    if (status === "failed" || status === "idle") {
+      dispatch(fetchCart());
+    }
   }, [dispatch, status]);
 
   return (

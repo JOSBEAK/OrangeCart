@@ -76,17 +76,18 @@ const CartItems = ({ items, isLoading }) => {
           >
             <Box
               sx={{
-                width: isMobile ? 100 : 150,
-                height: isMobile ? 100 : 150,
                 position: "relative",
+                aspectRatio: "1 / 1",
                 flexShrink: 0,
+                width: { xs: "100px", sm: "150px" },
               }}
             >
               <Image
                 src={item.thumbnail}
                 alt={item.title}
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="(max-width: 600px) 100px, 150px"
+                style={{ objectFit: "cover" }}
                 priority
               />
             </Box>

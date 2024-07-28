@@ -38,14 +38,14 @@ const OrderSummary = () => {
 
   useEffect(() => {
     if (items.length > 0) {
-      console.log("Setting showItems and loadItems to true");
+      console.log("Setting showItems and loadItems to true", items.length);
       setShowItems(true);
       setLoadItems(true);
     }
     if (activeStep === 0 || items.length === 0) {
       setShowItems(false);
     }
-  }, [currentPage, items]);
+  }, [currentPage, activeStep]);
 
   if (status === "loading") {
     return <OrderSummarySkeleton />;

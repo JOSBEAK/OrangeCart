@@ -11,7 +11,7 @@ const CartPage = ({ handleNext, isButtonDisabled }) => {
   const { items, status } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   useEffect(() => {
-    if (status !== "succeeded") {
+    if (status === "failed" || status === "idle") {
       dispatch(fetchCart());
     }
   });
