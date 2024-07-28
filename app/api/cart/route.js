@@ -1,32 +1,22 @@
 import { NextResponse } from "next/server";
-import NodeCache from "node-cache";
-import crypto from "crypto";
 
-const cache = new NodeCache({ stdTTL: 300 });
-
-function generateCacheKey(url) {
-  return crypto.createHash("md5").update(url).digest("hex");
-}
-
+let lastFetchedTime = 0;
 export async function GET() {
   const url = "https://dummyjson.com/carts/1";
-  const cacheKey = generateCacheKey(url);
-
-  // Check if data is in cache
-  const cachedData = cache.get(cacheKey);
-  if (cachedData) {
-    console.log("Serving from cache");
-    return NextResponse.json(cachedData);
-  }
 
   try {
-    console.log("Fetching fresh data");
-    const res = await fetch(url);
+    const res = await fetch(url, { next: { revalidate: 300 } });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch data");
+    }
+    if (Date.now() - lastFetchedTime < 300000) {
+      console.log("Data fetched from cache");
+    } else {
+      console.log("Data fetched from API");
+      lastFetchedTime = Date.now();
+    }
     const data = await res.json();
-
-    // Store data in cache
-    cache.set(cacheKey, data);
-
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching cart data:", error);
