@@ -8,13 +8,12 @@ import {
   Alert,
   Button,
   Snackbar,
-  TextField,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockIcon from "@mui/icons-material/Lock";
 import LoadingSpinner from "../misc/LoadingSpinner";
 import { useDispatch, useSelector } from "react-redux";
-import { setPaymentMethod } from "@/lib/slices/cartSlice";
+import { setPaymentMethod, setPaymentStatus } from "@/lib/slices/cartSlice";
 
 const PaymentForm = ({ onPaymentSuccess }) => {
   const [paymentSessionId, setPaymentSessionId] = useState("");
@@ -25,7 +24,6 @@ const PaymentForm = ({ onPaymentSuccess }) => {
   const { isPaymentDone, discountedTotal } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
-  const [upiId, setUpiId] = useState("");
   const [cardComponents, setCardComponents] = useState({});
   const [upiComponent, setUpiComponent] = useState(null);
   const [qrComponent, setQrComponent] = useState(null);
@@ -40,7 +38,6 @@ const PaymentForm = ({ onPaymentSuccess }) => {
         window.cashfree = cashfree;
         setIsSDKReady(true);
         console.log("Cashfree SDK initialized successfully");
-        initializeComponents(cashfree);
       } catch (error) {
         console.error("Error initializing Cashfree SDK:", error);
         setError(
@@ -76,20 +73,6 @@ const PaymentForm = ({ onPaymentSuccess }) => {
       });
   }, []);
 
-  const initializeComponents = (cashfree) => {
-    const cardNumber = cashfree.create("cardNumber", {});
-    const cardExpiry = cashfree.create("cardExpiry", {});
-    const cardCvv = cashfree.create("cardCvv", {});
-    const cardHolder = cashfree.create("cardHolder", {});
-    setCardComponents({ cardNumber, cardExpiry, cardCvv, cardHolder });
-
-    const upiCollect = cashfree.create("upiCollect", {});
-    setUpiComponent(upiCollect);
-
-    const upiQr = cashfree.create("upiQr", { values: { size: "200px" } });
-    setQrComponent(upiQr);
-  };
-
   useEffect(() => {
     if (isPaymentDone) {
       onPaymentSuccess();
@@ -98,16 +81,66 @@ const PaymentForm = ({ onPaymentSuccess }) => {
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
+    if (isExpanded) {
+      mountComponent(panel);
+    }
   };
 
-  const handleUPIPayment = async () => {
-    if (!isSDKReady || !window.cashfree || !upiComponent) {
+  const mountComponent = async (panel) => {
+    if (!isSDKReady || !window.cashfree) {
       setError("Payment system is not ready. Please try again later.");
       return;
     }
 
     try {
-      await upiComponent.mount("#upi-collect-container");
+      switch (panel) {
+        case "upi":
+          if (!upiComponent) {
+            const upiCollect = window.cashfree.create("upiCollect", {});
+            setUpiComponent(upiCollect);
+            await upiCollect.mount("#upi-collect-container");
+          }
+          break;
+        case "card":
+          if (Object.keys(cardComponents).length === 0) {
+            const cardNumber = window.cashfree.create("cardNumber", {});
+            const cardExpiry = window.cashfree.create("cardExpiry", {});
+            const cardCvv = window.cashfree.create("cardCvv", {});
+            const cardHolder = window.cashfree.create("cardHolder", {});
+
+            setCardComponents({ cardNumber, cardExpiry, cardCvv, cardHolder });
+
+            await cardNumber.mount("#card-number-container");
+            await cardExpiry.mount("#card-expiry-container");
+            await cardCvv.mount("#card-cvv-container");
+            await cardHolder.mount("#card-holder-container");
+          }
+          break;
+        case "qr":
+          if (!qrComponent) {
+            const upiQr = window.cashfree.create("upiQr", {
+              values: { size: "200px" },
+            });
+            setQrComponent(upiQr);
+            await upiQr.mount("#upi-qr-container");
+          }
+          break;
+      }
+    } catch (error) {
+      console.error(`Error mounting ${panel} component:`, error);
+      setError(
+        `An error occurred while preparing the ${panel} payment option. Please try again.`
+      );
+    }
+  };
+
+  const handleUPIPayment = async () => {
+    if (!upiComponent) {
+      setError("UPI payment option is not ready. Please try again.");
+      return;
+    }
+
+    try {
       const paymentData = {
         paymentSessionId: paymentSessionId,
         paymentMethod: upiComponent,
@@ -122,17 +155,12 @@ const PaymentForm = ({ onPaymentSuccess }) => {
   };
 
   const handleCardPayment = async () => {
-    if (!isSDKReady || !window.cashfree || !cardComponents.cardNumber) {
-      setError("Payment system is not ready. Please try again later.");
+    if (Object.keys(cardComponents).length === 0) {
+      setError("Card payment option is not ready. Please try again.");
       return;
     }
 
     try {
-      await cardComponents.cardNumber.mount("#card-number-container");
-      await cardComponents.cardExpiry.mount("#card-expiry-container");
-      await cardComponents.cardCvv.mount("#card-cvv-container");
-      await cardComponents.cardHolder.mount("#card-holder-container");
-
       const paymentData = {
         paymentSessionId: paymentSessionId,
         paymentMethod: cardComponents.cardNumber,
@@ -147,13 +175,12 @@ const PaymentForm = ({ onPaymentSuccess }) => {
   };
 
   const handleQRPayment = async () => {
-    if (!isSDKReady || !window.cashfree || !qrComponent) {
-      setError("Payment system is not ready. Please try again later.");
+    if (!qrComponent) {
+      setError("QR payment option is not ready. Please try again.");
       return;
     }
 
     try {
-      await qrComponent.mount("#upi-qr-container");
       const paymentData = {
         paymentSessionId: paymentSessionId,
         paymentMethod: qrComponent,
@@ -162,19 +189,24 @@ const PaymentForm = ({ onPaymentSuccess }) => {
       const result = await window.cashfree.pay(paymentData);
       handlePaymentResult(result);
     } catch (error) {
-      console.error("Error generating QR code:", error);
-      setError("An error occurred while generating QR code. Please try again.");
+      console.error("Error during QR payment:", error);
+      setError("An error occurred during QR payment. Please try again.");
     }
   };
 
   const handlePaymentResult = (result) => {
     if (result.error) {
+      // dispatch(setPaymentStatus("FAILURE"));
+      // window.location.href = "/checkout";
+      // onPaymentSuccess();
       setError(result.error.message || "Payment failed. Please try again.");
     } else if (result.redirect) {
-      window.location.href = result.redirect;
-    } else if (result.paymentDetails) {
-      console.log("Payment successful:", result.paymentDetails);
+      window.location.href = "/checkout";
+      dispatch(setPaymentStatus("SUCCESS"));
       onPaymentSuccess();
+    } else if (result.paymentDetails) {
+      window.location.href = "/checkout";
+      dispatch(setPaymentStatus("SUCCESS"));
     }
   };
 
