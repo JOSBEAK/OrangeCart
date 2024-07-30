@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import {
   Typography,
@@ -10,15 +8,11 @@ import {
   Alert,
   Button,
   Snackbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  TextField,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockIcon from "@mui/icons-material/Lock";
 import LoadingSpinner from "../misc/LoadingSpinner";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { setPaymentMethod } from "@/lib/slices/cartSlice";
 
@@ -28,10 +22,13 @@ const PaymentForm = ({ onPaymentSuccess }) => {
   const [isSDKReady, setIsSDKReady] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState(null);
-  const [paymentDetails, setPaymentDetails] = useState(null);
-  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   const { isPaymentDone, discountedTotal } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+
+  const [upiId, setUpiId] = useState("");
+  const [cardComponents, setCardComponents] = useState({});
+  const [upiComponent, setUpiComponent] = useState(null);
+  const [qrComponent, setQrComponent] = useState(null);
 
   useEffect(() => {
     const initializeSDK = async () => {
@@ -43,6 +40,7 @@ const PaymentForm = ({ onPaymentSuccess }) => {
         window.cashfree = cashfree;
         setIsSDKReady(true);
         console.log("Cashfree SDK initialized successfully");
+        initializeComponents(cashfree);
       } catch (error) {
         console.error("Error initializing Cashfree SDK:", error);
         setError(
@@ -78,57 +76,111 @@ const PaymentForm = ({ onPaymentSuccess }) => {
       });
   }, []);
 
+  const initializeComponents = (cashfree) => {
+    const cardNumber = cashfree.create("cardNumber", {});
+    const cardExpiry = cashfree.create("cardExpiry", {});
+    const cardCvv = cashfree.create("cardCvv", {});
+    const cardHolder = cashfree.create("cardHolder", {});
+    setCardComponents({ cardNumber, cardExpiry, cardCvv, cardHolder });
+
+    const upiCollect = cashfree.create("upiCollect", {});
+    setUpiComponent(upiCollect);
+
+    const upiQr = cashfree.create("upiQr", { values: { size: "200px" } });
+    setQrComponent(upiQr);
+  };
+
   useEffect(() => {
     if (isPaymentDone) {
       onPaymentSuccess();
     }
   }, [isPaymentDone]);
+
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  const fetchPaymentDetails = async (orderId) => {
-    try {
-      const response = await fetch(`/api/fetch-payment-details/${orderId}`);
-      const data = await response.json();
-      if (response.ok) {
-        setPaymentDetails(data);
-        setShowPaymentDetails(true);
-      } else {
-        throw new Error(data.error || "Failed to fetch payment details");
-      }
-    } catch (error) {
-      console.error("Error fetching payment details:", error);
-      setError("Failed to fetch payment details. Please try again.");
-    }
-  };
-
-  const handlePayment = async () => {
-    if (!isSDKReady || !window.cashfree) {
+  const handleUPIPayment = async () => {
+    if (!isSDKReady || !window.cashfree || !upiComponent) {
       setError("Payment system is not ready. Please try again later.");
       return;
     }
 
-    if (!paymentSessionId) {
-      setError("Payment session is not available. Please try again.");
+    try {
+      await upiComponent.mount("#upi-collect-container");
+      const paymentData = {
+        paymentSessionId: paymentSessionId,
+        paymentMethod: upiComponent,
+        returnUrl: `${window.location.origin}/payment-status?orderId=${orderId}`,
+      };
+      const result = await window.cashfree.pay(paymentData);
+      handlePaymentResult(result);
+    } catch (error) {
+      console.error("Error during UPI payment:", error);
+      setError("An error occurred during UPI payment. Please try again.");
+    }
+  };
+
+  const handleCardPayment = async () => {
+    if (!isSDKReady || !window.cashfree || !cardComponents.cardNumber) {
+      setError("Payment system is not ready. Please try again later.");
       return;
     }
 
-    let checkoutOptions = {
-      paymentSessionId: paymentSessionId,
-      returnUrl: `${window.location.origin}/payment-status?order_id=${orderId}`,
-    };
+    try {
+      await cardComponents.cardNumber.mount("#card-number-container");
+      await cardComponents.cardExpiry.mount("#card-expiry-container");
+      await cardComponents.cardCvv.mount("#card-cvv-container");
+      await cardComponents.cardHolder.mount("#card-holder-container");
+
+      const paymentData = {
+        paymentSessionId: paymentSessionId,
+        paymentMethod: cardComponents.cardNumber,
+        returnUrl: `${window.location.origin}/payment-status?orderId=${orderId}`,
+      };
+      const result = await window.cashfree.pay(paymentData);
+      handlePaymentResult(result);
+    } catch (error) {
+      console.error("Error during card payment:", error);
+      setError("An error occurred during card payment. Please try again.");
+    }
+  };
+
+  const handleQRPayment = async () => {
+    if (!isSDKReady || !window.cashfree || !qrComponent) {
+      setError("Payment system is not ready. Please try again later.");
+      return;
+    }
 
     try {
-      await window.cashfree.checkout(checkoutOptions);
+      await qrComponent.mount("#upi-qr-container");
+      const paymentData = {
+        paymentSessionId: paymentSessionId,
+        paymentMethod: qrComponent,
+        returnUrl: `${window.location.origin}/payment-status?orderId=${orderId}`,
+      };
+      const result = await window.cashfree.pay(paymentData);
+      handlePaymentResult(result);
     } catch (error) {
-      console.error("Error during checkout:", error);
-      setError("An error occurred during payment. Please try again.");
+      console.error("Error generating QR code:", error);
+      setError("An error occurred while generating QR code. Please try again.");
+    }
+  };
+
+  const handlePaymentResult = (result) => {
+    if (result.error) {
+      setError(result.error.message || "Payment failed. Please try again.");
+    } else if (result.redirect) {
+      window.location.href = result.redirect;
+    } else if (result.paymentDetails) {
+      console.log("Payment successful:", result.paymentDetails);
+      onPaymentSuccess();
     }
   };
 
   const handleCashOnDelivery = () => {
     dispatch(setPaymentMethod("COD"));
+    onPaymentSuccess();
   };
 
   if (!isSDKReady) {
@@ -153,41 +205,16 @@ const PaymentForm = ({ onPaymentSuccess }) => {
         Payments are secure and encrypted.
       </Alert>
 
-      <Accordion
-        expanded={expanded === "cashfree"}
-        onChange={handleChange("cashfree")}
-      >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            "& .MuiAccordionSummary-content": {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            },
-          }}
-        >
-          <Typography>Pay with Cashfree</Typography>
-          <Image
-            src="/cashfree-icon.png"
-            alt="Cashfree"
-            width={80}
-            height={30}
-            style={{
-              maxWidth: "100%",
-
-              objectFit: "contain",
-            }}
-          />
+      <Accordion expanded={expanded === "upi"} onChange={handleChange("upi")}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Pay with UPI</Typography>
         </AccordionSummary>
         <AccordionDetails>
+          <div id="upi-collect-container"></div>
           <Button
             variant="contained"
             color="primary"
-            onClick={handlePayment}
+            onClick={handleUPIPayment}
             fullWidth
             sx={{
               mt: 2,
@@ -196,7 +223,68 @@ const PaymentForm = ({ onPaymentSuccess }) => {
               "&:hover": { backgroundColor: "grey.800" },
             }}
           >
-            Pay Now
+            Pay with UPI
+          </Button>
+        </AccordionDetails>
+      </Accordion>
+
+      <Accordion expanded={expanded === "card"} onChange={handleChange("card")}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Pay with Card</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div
+            id="card-number-container"
+            style={{ marginBottom: "10px" }}
+          ></div>
+          <div
+            id="card-expiry-container"
+            style={{ marginBottom: "10px" }}
+          ></div>
+          <div id="card-cvv-container" style={{ marginBottom: "10px" }}></div>
+          <div
+            id="card-holder-container"
+            style={{ marginBottom: "10px" }}
+          ></div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCardPayment}
+            fullWidth
+            sx={{
+              mt: 2,
+              backgroundColor: "black",
+              color: "white",
+              "&:hover": { backgroundColor: "grey.800" },
+            }}
+          >
+            Pay with Card
+          </Button>
+        </AccordionDetails>
+      </Accordion>
+
+      <Accordion expanded={expanded === "qr"} onChange={handleChange("qr")}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Pay with QR Code</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div
+            id="upi-qr-container"
+            style={{ width: "200px", height: "200px", margin: "auto" }}
+          ></div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleQRPayment}
+            fullWidth
+            sx={{
+              mt: 2,
+              backgroundColor: "black",
+              color: "white",
+              "&:hover": { backgroundColor: "grey.800" },
+            }}
+          >
+            Pay with QR Code
           </Button>
         </AccordionDetails>
       </Accordion>
@@ -232,26 +320,6 @@ const PaymentForm = ({ onPaymentSuccess }) => {
         onClose={() => setError(null)}
         message={error}
       />
-
-      <Dialog
-        open={showPaymentDetails}
-        onClose={() => setShowPaymentDetails(false)}
-      >
-        <DialogTitle>Payment Details</DialogTitle>
-        <DialogContent>
-          {paymentDetails && (
-            <Box>
-              <Typography>Order ID: {paymentDetails.order_id}</Typography>
-              <Typography>Amount: {paymentDetails.order_amount}</Typography>
-              <Typography>Status: {paymentDetails.order_status}</Typography>
-              {/* Add more details as needed */}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowPaymentDetails(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };
