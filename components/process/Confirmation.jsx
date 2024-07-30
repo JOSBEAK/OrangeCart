@@ -180,7 +180,7 @@ const ConfirmationComponent = () => {
                     ? `Your pending payment of `
                     : `The attempted payment of `}
                   <Box component="span" fontWeight="bold">
-                    ${discountedTotal}
+                    ${discountedTotal + 85.5}
                   </Box>
                   {paymentMethod === "COD"
                     ? `. Please pay upon delivery.`

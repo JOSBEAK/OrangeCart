@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, Container } from "@mui/material";
 import ErrorBoundary from "@/components/misc/ErrorBoundary";
 import OrderSummary from "@/components/process/OrderSummary";
-import PaymentSuccessModal from "@/components/payment/PaymentSuccess";
+
 import { setActiveStep } from "@/lib/slices/cartSlice";
 import CheckoutStepper from "@/components/process/CheckoutStepper";
 
@@ -53,7 +53,6 @@ export default function CheckoutPage() {
   }, [isPaymentDone]);
 
   const handlePaymentSuccess = () => {
-    setIsSuccessModalOpen(true);
     dispatch(setActiveStep(3));
   };
 
@@ -94,10 +93,6 @@ export default function CheckoutPage() {
           }
         </Box>
       </Container>
-      <PaymentSuccessModal
-        open={isSuccessModalOpen}
-        onClose={() => setIsSuccessModalOpen(false)}
-      />
     </ErrorBoundary>
   );
 }

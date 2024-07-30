@@ -129,7 +129,6 @@ const PaymentForm = ({ onPaymentSuccess }) => {
 
   const handleCashOnDelivery = () => {
     dispatch(setPaymentMethod("COD"));
-    onPaymentSuccess();
   };
 
   if (!isSDKReady) {
