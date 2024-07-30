@@ -14,7 +14,7 @@ export default function ClientLayout({ children }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const savedMode = localStorage.getItem("themeMode");
+    const savedMode = sessionStorage.getItem("themeMode");
     if (savedMode) {
       setMode(savedMode);
     }
@@ -34,7 +34,7 @@ export default function ClientLayout({ children }) {
   const toggleTheme = () => {
     setMode((prevMode) => {
       const newMode = prevMode === "light" ? "dark" : "light";
-      localStorage.setItem("themeMode", newMode);
+      sessionStorage.setItem("themeMode", newMode);
       return newMode;
     });
   };

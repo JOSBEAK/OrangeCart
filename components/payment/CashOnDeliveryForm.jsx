@@ -1,11 +1,15 @@
 import React from "react";
 import { Typography, Button } from "@mui/material";
-import Link from "next/link";
+
 import { useDispatch } from "react-redux";
-import { setPaymentMethod } from "@/lib/slices/cartSlice";
+import { setPaymentMethod, setPaymentStatus } from "@/lib/slices/cartSlice";
 
 const CashOnDeliveryForm = () => {
   const dispatch = useDispatch();
+  const handleCod = () => {
+    dispatch(setPaymentMethod("COD"));
+    dispatch(setPaymentStatus("SUCCESS"));
+  };
   return (
     <>
       <Typography variant="body1">
@@ -21,7 +25,7 @@ const CashOnDeliveryForm = () => {
           color: "white",
           "&:hover": { backgroundColor: "grey.800" },
         }}
-        onClick={() => dispatch(setPaymentMethod("COD"))}
+        onClick={handleCod}
       >
         Place Order
       </Button>

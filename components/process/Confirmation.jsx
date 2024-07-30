@@ -13,19 +13,20 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
+  Alert,
 } from "@mui/material";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { resetCart } from "@/lib/slices/cartSlice";
 import { useRouter } from "next/navigation";
 import buttonStyle from "@/styles/buttonStyle";
+import { CheckCircle, ErrorOutline, InfoOutlined } from "@mui/icons-material";
 
 const ConfirmationComponent = () => {
-  const { discountedTotal, address, paymentMethod } = useSelector(
-    (state) => state.cart
-  );
+  const { discountedTotal, address, paymentMethod, paymentStatus } =
+    useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
@@ -46,6 +47,94 @@ const ConfirmationComponent = () => {
     setTimeout(() => {
       dispatch(resetCart());
     }, 100);
+  };
+
+  const renderPaymentStatusIcon = () => {
+    if (paymentMethod === "COD") {
+      return (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        >
+          <CheckCircle color="success" sx={{ fontSize: 80 }} />
+        </motion.div>
+      );
+    }
+
+    switch (paymentStatus) {
+      case "SUCCESS":
+        return (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          >
+            <CheckCircle color="success" sx={{ fontSize: 80 }} />
+          </motion.div>
+        );
+      case "PENDING":
+        return (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          >
+            <InfoOutlined color="warning" sx={{ fontSize: 80 }} />
+          </motion.div>
+        );
+      default:
+        return (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          >
+            <ErrorOutline color="error" sx={{ fontSize: 80 }} />
+          </motion.div>
+        );
+    }
+  };
+
+  const renderPaymentStatusMessage = () => {
+    if (paymentMethod === "COD") {
+      return (
+        <Typography
+          variant="h4"
+          gutterBottom
+          align="center"
+          color="success.main"
+        >
+          Order Confirmed!
+        </Typography>
+      );
+    }
+
+    switch (paymentStatus) {
+      case "SUCCESS":
+        return (
+          <Typography variant="h4" gutterBottom align="center">
+            Payment Successful!
+          </Typography>
+        );
+      case "PENDING":
+        return (
+          <Typography
+            variant="h4"
+            gutterBottom
+            align="center"
+            color="warning.main"
+          >
+            Payment Pending
+          </Typography>
+        );
+      default:
+        return (
+          <Typography variant="h4" gutterBottom align="center" color="error">
+            Payment Failed
+          </Typography>
+        );
+    }
   };
 
   return (
@@ -74,137 +163,143 @@ const ConfirmationComponent = () => {
             }}
           >
             <Grid container spacing={4} direction="column" alignItems="center">
+              <Grid item>{renderPaymentStatusIcon()}</Grid>
               <Grid item>
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                >
-                  <CheckCircleOutlineIcon
-                    color="primary"
-                    sx={{ fontSize: 80 }}
-                  />
-                </motion.div>
-              </Grid>
-              <Grid item>
-                {paymentMethod === "UPI" || paymentMethod === "Card" ? (
-                  <Typography variant="h4" gutterBottom align="center">
-                    Payment Successful! Payment Method: {paymentMethod}
-                  </Typography>
-                ) : (
-                  <>
-                    <Typography variant="h4" gutterBottom align="center">
-                      Order Confirmed!
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom align="center">
-                      Payment Method: {paymentMethod}
-                    </Typography>
-                  </>
-                )}
+                {renderPaymentStatusMessage()}
+                <Typography variant="subtitle1" gutterBottom align="center">
+                  Payment Method: {paymentMethod}
+                </Typography>
               </Grid>
               <Grid item>
                 <Typography variant="h6" align="center" color="text.secondary">
-                  {paymentMethod === "UPI" || paymentMethod === "Card"
+                  {paymentMethod === "COD"
+                    ? `Your order total is `
+                    : paymentStatus === "SUCCESS"
                     ? `Your payment of `
-                    : `Please pay `}
+                    : paymentStatus === "PENDING"
+                    ? `Your pending payment of `
+                    : `The attempted payment of `}
                   <Box component="span" fontWeight="bold">
                     ${discountedTotal}
                   </Box>
-                  {paymentMethod === "UPI" || paymentMethod === "Card"
+                  {paymentMethod === "COD"
+                    ? `. Please pay upon delivery.`
+                    : paymentStatus === "SUCCESS"
                     ? ` has been processed successfully.`
-                    : ` to the delivery agent for Order.`}
+                    : paymentStatus === "PENDING"
+                    ? ` is being processed.`
+                    : ` was not successful.`}
                 </Typography>
               </Grid>
+              {paymentStatus === "FAILED" && paymentMethod !== "COD" && (
+                <Grid item>
+                  <Alert severity="error">
+                    Your payment was not successful. Please try again or contact
+                    customer support.
+                  </Alert>
+                </Grid>
+              )}
+              {paymentStatus === "PENDING" && paymentMethod !== "COD" && (
+                <Grid item>
+                  <Alert severity="warning">
+                    Your payment is being processed. We&apos;ll update you once
+                    it&apos;s confirmed.
+                  </Alert>
+                </Grid>
+              )}
               <Grid item sx={{ width: "100%" }}>
                 <Divider sx={{ my: 2 }} />
               </Grid>
 
-              <Grid
-                item
-                container
-                direction="column"
-                spacing={2}
-                sx={{ width: "100%" }}
-              >
-                <Grid item>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      mb: 2,
-                      justifyContent: "center",
-                    }}
-                  >
-                    <LocalShippingIcon color="primary" sx={{ mr: 1 }} />
-                    <Typography variant="h6" fontWeight={700}>
-                      Delivery Address
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item>
-                  <Box
-                    sx={{
-                      bgcolor:
-                        theme.palette.mode === "dark"
-                          ? theme.palette.grey[800]
-                          : theme.palette.grey[100],
-                      p: 3,
-                      borderRadius: 2,
-                      maxWidth: "100%",
-                      margin: "auto",
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{ lineHeight: 1.6, textAlign: "center" }}
+              {(paymentStatus === "SUCCESS" || paymentMethod === "COD") && (
+                <Grid
+                  item
+                  container
+                  direction="column"
+                  spacing={2}
+                  sx={{ width: "100%" }}
+                >
+                  <Grid item>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mb: 2,
+                        justifyContent: "center",
+                      }}
                     >
-                      <Box component="span" fontWeight="bold">
-                        {address.firstName} {address.lastName}
-                      </Box>
-                      <br />
-                      {address.streetAddress}
-                      {address.landmark && (
-                        <>
-                          <br />
-                          {address.landmark}
-                        </>
-                      )}
-                      <br />
-                      {address.city}, {address.state} {address.pincode}
-                      <br />
-                      {address.country}
-                      <br />
-                      Phone:{" "}
-                      <Box component="span" fontWeight="bold">
-                        {address.mobileNumber}
-                      </Box>
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item>
-                  <Box
-                    sx={{
-                      bgcolor:
-                        theme.palette.mode === "dark"
-                          ? theme.palette.primary.dark
-                          : theme.palette.primary.light,
-                      p: 2,
-                      borderRadius: 2,
-                      maxWidth: "100%",
-                      margin: "auto",
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      color={theme.palette.primary.contrastText}
-                      align="center"
+                      <LocalShippingIcon color="primary" sx={{ mr: 1 }} />
+                      <Typography variant="h6" fontWeight={700}>
+                        Delivery Address
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <Box
+                      sx={{
+                        bgcolor:
+                          theme.palette.mode === "dark"
+                            ? theme.palette.grey[800]
+                            : theme.palette.grey[100],
+                        p: 3,
+                        borderRadius: 2,
+                        maxWidth: "100%",
+                        margin: "auto",
+                      }}
                     >
-                      Your order will be delivered within 3-5 business days. You
-                      will receive a tracking number once your package ships.
-                    </Typography>
-                  </Box>
+                      <Typography
+                        variant="body1"
+                        sx={{ lineHeight: 1.6, textAlign: "center" }}
+                      >
+                        <Box component="span" fontWeight="bold">
+                          {address.firstName} {address.lastName}
+                        </Box>
+                        <br />
+                        {address.streetAddress}
+                        {address.landmark && (
+                          <>
+                            <br />
+                            {address.landmark}
+                          </>
+                        )}
+                        <br />
+                        {address.city}, {address.state} {address.pincode}
+                        <br />
+                        {address.country}
+                        <br />
+                        Phone:{" "}
+                        <Box component="span" fontWeight="bold">
+                          {address.mobileNumber}
+                        </Box>
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <Box
+                      sx={{
+                        bgcolor:
+                          theme.palette.mode === "dark"
+                            ? theme.palette.primary.dark
+                            : theme.palette.primary.light,
+                        p: 2,
+                        borderRadius: 2,
+                        maxWidth: "100%",
+                        margin: "auto",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        color={theme.palette.primary.contrastText}
+                        align="center"
+                      >
+                        Your order will be delivered within 3-5 business days.
+                        You will receive a tracking number once your package
+                        ships.
+                      </Typography>
+                    </Box>
+                  </Grid>
                 </Grid>
-              </Grid>
+              )}
               <Grid item sx={{ mt: 4 }}>
                 <Button
                   variant="contained"
