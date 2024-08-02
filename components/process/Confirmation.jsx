@@ -18,7 +18,6 @@ import {
 
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { resetCart } from "@/lib/slices/cartSlice";
 import { useRouter } from "next/navigation";
 import buttonStyle from "@/styles/buttonStyle";
@@ -131,7 +130,7 @@ const ConfirmationComponent = () => {
       default:
         return (
           <Typography variant="h4" gutterBottom align="center" color="error">
-            Payment Failed
+            Payment {paymentStatus}
           </Typography>
         );
     }
@@ -141,17 +140,19 @@ const ConfirmationComponent = () => {
     <Box
       sx={{
         flexGrow: 1,
-        margin: "auto",
         backgroundColor: theme.palette.background.default,
         minHeight: "100vh",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        flexDirection: "column",
       }}
     >
       <Container
         maxWidth={isSmallScreen ? "sm" : "md"}
-        sx={{ px: { xs: 0, sm: 1, md: 3 } }}
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
         <Fade in={true} timeout={1000}>
           <Paper
@@ -160,9 +161,18 @@ const ConfirmationComponent = () => {
               p: { xs: 2, sm: 3, md: 4 },
               borderRadius: 4,
               overflow: "hidden",
+              flexGrow: 1,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <Grid container spacing={4} direction="column" alignItems="center">
+            <Grid
+              container
+              spacing={4}
+              direction="column"
+              alignItems="center"
+              sx={{ flexGrow: 1 }}
+            >
               <Grid item>{renderPaymentStatusIcon()}</Grid>
               <Grid item>
                 {renderPaymentStatusMessage()}
