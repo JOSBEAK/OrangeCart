@@ -44,21 +44,6 @@ const StyledAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
   borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
-const QRContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  marginTop: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  padding: theme.spacing(2),
-  border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor:
-    theme.palette.mode === "dark"
-      ? theme.palette.grey[800]
-      : theme.palette.grey[100],
-}));
-
 const QRPayment = ({
   paymentSessionId,
   orderId,
@@ -68,17 +53,11 @@ const QRPayment = ({
   const theme = useTheme();
   const [qrComponent, setQrComponent] = useState(null);
   const [expanded, setExpanded] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
 
   const handleChange = (event, isExpanded) => {
     setExpanded(isExpanded);
-    if (isExpanded && !qrComponent && isMounted) {
+    if (isExpanded && !qrComponent) {
       mountQRComponent();
     }
   };
@@ -89,14 +68,6 @@ const QRPayment = ({
     try {
       const upiQr = window.cashfree.create("upiQr", {
         values: { size: "200px" },
-        style: {
-          base: {
-            backgroundColor: theme.palette.grey[800],
-            border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-            borderRadius: theme.shape.borderRadius,
-            padding: theme.spacing(1),
-          },
-        },
       });
       setQrComponent(upiQr);
       await upiQr.mount("#upi-qr-container");
@@ -118,10 +89,6 @@ const QRPayment = ({
       onPaymentSuccess
     );
 
-  if (!isMounted) {
-    return null; // or a loading placeholder
-  }
-
   return (
     <StyledAccordion expanded={expanded} onChange={handleChange}>
       <StyledAccordionSummary
@@ -135,21 +102,18 @@ const QRPayment = ({
         </Typography>
       </StyledAccordionSummary>
       <StyledAccordionDetails>
-        <Typography variant="body2" color="textSecondary" paragraph>
-          Scan the QR code below with your UPI app to make a quick and secure
-          payment.
-        </Typography>
-
-        <QRContainer>
-          <div
-            id="upi-qr-container"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          ></div>
-        </QRContainer>
-
+        <Box
+          id="upi-qr-container"
+          sx={{
+            width: "200px",
+            height: "200px",
+            margin: "auto",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            mb: 2,
+          }}
+        ></Box>
         <Button
           variant="contained"
           color="primary"
